@@ -183,7 +183,7 @@ class EmbeddingDictionary(object):
     embedding_dict = collections.defaultdict(lambda:default_embedding)
     if len(path) > 0:
       vocab_size = None
-      with open(path) as f:
+      with open(path, 'r', encoding='utf-8') as f:
         for line in f.readlines():
           word_end = line.find(" ")
           word = line[:word_end]
