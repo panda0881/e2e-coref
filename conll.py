@@ -92,7 +92,7 @@ def official_conll_eval(gold_path, predicted_path, metric, official_stdout=False
   return { "r": recall, "p": precision, "f": f1 }
 
 def evaluate_conll(gold_path, predictions, official_stdout=False):
-  with tempfile.NamedTemporaryFile(delete=False, mode="w") as prediction_file:
+  with tempfile.NamedTemporaryFile(delete=False, mode="w", encoding='utf-8') as prediction_file:
     with open(gold_path, "r", encoding='utf-8') as gold_file:
       output_conll(gold_file, prediction_file, predictions)
     print("Predicted conll file: {}".format(prediction_file.name))
