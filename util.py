@@ -184,7 +184,7 @@ class EmbeddingDictionary(object):
     if len(path) > 0:
       vocab_size = None
       with open(path) as f:
-        for i, line in enumerate(f.readlines()):
+        for line in f.readlines():
           word_end = line.find(" ")
           word = line[:word_end]
           embedding = np.fromstring(line[word_end + 1:], np.float32, sep=" ")
