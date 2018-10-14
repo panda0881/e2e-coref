@@ -60,5 +60,6 @@ if __name__ == "__main__":
 
                 writer.add_summary(eval_summary, tf_global_step)
                 writer.add_summary(util.make_summary({"max_eval_f1": max_f1}), tf_global_step)
+                writer.flush()
 
                 print("[{}] evaL_f1={:.2f}, max_f1={:.2f}".format(tf_global_step, eval_f1, max_f1))
