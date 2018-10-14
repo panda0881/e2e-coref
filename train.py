@@ -58,7 +58,7 @@ if __name__ == "__main__":
                     max_f1 = eval_f1
                     util.copy_checkpoint(os.path.join(log_dir, "model-{}".format(tf_global_step)),
                                          os.path.join(log_dir, "model.max.ckpt"))
-
+                print('start to write')
                 writer.add_summary(eval_summary, tf_global_step)
                 writer.add_summary(util.make_summary({"max_eval_f1": max_f1}), tf_global_step)
                 writer.flush()
