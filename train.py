@@ -21,11 +21,12 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
     log_dir = config["log_dir"]
-    writer = tf.summary.FileWriter(log_dir, flush_secs=20)
+
 
     max_f1 = 0
 
     with tf.Session() as session:
+        writer = tf.summary.FileWriter(log_dir, session.graph, flush_secs=20)
         session.run(tf.global_variables_initializer())
         model.start_enqueue_thread(session)
         accumulated_loss = 0.0
