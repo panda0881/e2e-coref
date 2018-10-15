@@ -72,14 +72,14 @@ if __name__ == "__main__":
                         if i < j:
                             if len(c[i][1]) == 1 and c[i][1][0] in all_pronouns:
                                 if len(c[j][1]) == 1 and c[j][1][0] in all_pronouns:
-                                    P_P_clusters.append((set(c[i][0]), set(c[j][0])))
+                                    P_P_clusters.append((tuple(c[i][0]), tuple(c[j][0])))
                                 else:
-                                    NP_P_clusters.append((set(c[i][0]), set(c[j][0])))
+                                    NP_P_clusters.append((tuple(c[i][0]), tuple(c[j][0])))
                             else:
                                 if len(c[j][1]) == 1 and c[j][1][0] in all_pronouns:
-                                    NP_P_clusters.append((set(c[i][0]), set(c[j][0])))
+                                    NP_P_clusters.append((tuple(c[i][0]), tuple(c[j][0])))
                                 else:
-                                    NP_NP_clusters.append((set(c[i][0]), set(c[j][0])))
+                                    NP_NP_clusters.append((tuple(c[i][0]), tuple(c[j][0])))
             tmp_example['NP_NP_clusters'] = NP_NP_clusters
             # NP_NP_test_data.append(tmp_example)
             tmp_example['NP_P_clusters'] = NP_P_clusters
