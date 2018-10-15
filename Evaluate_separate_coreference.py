@@ -4,7 +4,7 @@
 # from __future__ import print_function
 import ujson as json
 
-# import os
+import os
 #
 import tensorflow as tf
 import coref_model as cm
@@ -17,6 +17,7 @@ import util
 #     model.restore(session)
 #     model.evaluate(session, official_stdout=True)
 if __name__ == "__main__":
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
     personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'she', 'her', 'he', 'him', 'it', 'them', 'they']
     relative_pronouns = ['that', 'which', 'who', 'whom', 'whose', 'whichever', 'whoever', 'whomever']
     demonstrative_pronouns = ['this', 'these', 'that', 'those']
@@ -89,6 +90,7 @@ if __name__ == "__main__":
 
     config = util.initialize_from_env()
     model = cm.CorefModel(config)
+
     with tf.Session() as session:
         model.restore(session)
 
