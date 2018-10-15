@@ -636,10 +636,9 @@ class CorefModel(object):
         return util.make_summary(summary_dict), average_f1
 
     def evaluate_external_data(self, session, evaluation_data, official_stdout=False):
-        def load_data_by_line(line):
+        def load_data_by_line(example):
             return self.tensorize_example(example, is_training=False), example
-        with open(self.config["eval_path"]) as f:
-            self.eval_data = [load_data_by_line(l) for l in evaluation_data]
+        self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
         print("Loaded {} eval examples.".format(len(self.eval_data)))
 
