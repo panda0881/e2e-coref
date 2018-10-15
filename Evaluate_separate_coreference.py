@@ -43,9 +43,10 @@ if __name__ == "__main__":
 
     all_pronouns = set(all_pronouns)
 
-    NP_NP_test_data = list()
-    NP_P_test_data = list()
-    P_P_test_data = list()
+    # NP_NP_test_data = list()
+    # NP_P_test_data = list()
+    # P_P_test_data = list()
+    test_data = list()
     print('Start to process data...')
     with open('test.english.jsonlines', 'r') as f:
         for line in f:
@@ -79,12 +80,13 @@ if __name__ == "__main__":
                                     NP_P_clusters.append((c[i][0], c[j][0]))
                                 else:
                                     NP_NP_clusters.append((c[i][0], c[j][0]))
-            tmp_example['clusters'] = NP_NP_clusters
-            NP_NP_test_data.append(tmp_example)
-            tmp_example['clusters'] = NP_P_clusters
-            NP_P_test_data.append(tmp_example)
-            tmp_example['clusters'] = P_P_clusters
-            P_P_test_data.append(tmp_example)
+            tmp_example['NP_NP_clusters'] = NP_NP_clusters
+            # NP_NP_test_data.append(tmp_example)
+            tmp_example['NP_P_clusters'] = NP_P_clusters
+            # NP_P_test_data.append(tmp_example)
+            tmp_example['P_P_clusters'] = P_P_clusters
+            # P_P_test_data.append(tmp_example)
+            test_data.append(tmp_example)
     print('finish processing data')
 
 
@@ -94,14 +96,9 @@ if __name__ == "__main__":
     with tf.Session() as session:
         model.restore(session)
 
-        print('we are working on NP-NP')
-        model.evaluate_external_data(session, NP_NP_test_data, official_stdout=True)
+        # print('we are working on NP-NP')
+        model.evaluate_external_data(session, test_data, official_stdout=True)
 
-        print('we are working on NP-P')
-        model.evaluate_external_data(session, NP_P_test_data, official_stdout=True)
-
-        print('we are working on P-P')
-        model.evaluate_external_data(session, P_P_test_data, official_stdout=True)
 
 
 print('end')

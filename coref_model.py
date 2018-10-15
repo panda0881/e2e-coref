@@ -17,6 +17,7 @@ import util
 import coref_ops
 import conll
 import metrics
+from util import *
 
 
 class CorefModel(object):
@@ -635,15 +636,97 @@ class CorefModel(object):
 
         return util.make_summary(summary_dict), average_f1
 
+    def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
+        NP_NP_clusters = list()
+        NP_P_clusters = list()
+        P_P_clusters = list()
+        predicted_clusters, mention_to_predicted = self.get_predicted_clusters(top_span_starts, top_span_ends,
+                                                                               predicted_antecedents)
+        all_clusters = list()
+        all_sentence = list()
+        for s in example['sentences']:
+            all_sentence += s
+        for c in predicted_clusters:
+            tmp_c = list()
+            for w in c:
+                tmp_w = list()
+                for token in all_sentence[w[0]:w[1] + 1]:
+                    tmp_w.append(token)
+                tmp_c.append((w, tmp_w))
+            all_clusters.append(tmp_c)
+        for c in all_clusters:
+            for i in range(len(c)):
+                for j in range(len(c)):
+                    if i < j:
+                        if len(c[i][1]) == 1 and c[i][1][0] in all_pronouns:
+                            if len(c[j][1]) == 1 and c[j][1][0] in all_pronouns:
+                                P_P_clusters.append((c[i][0], c[j][0]))
+                            else:
+                                NP_P_clusters.append((c[i][0], c[j][0]))
+                        else:
+                            if len(c[j][1]) == 1 and c[j][1][0] in all_pronouns:
+                                NP_P_clusters.append((c[i][0], c[j][0]))
+                            else:
+                                NP_NP_clusters.append((c[i][0], c[j][0]))
+        return NP_NP_clusters, NP_P_clusters, P_P_clusters
+
+    def evaluate_pairwise_coref(self, predicted_clusters, gold_clusters):
+        NP_NP_predict = len(predicted_clusters[0])
+        NP_NP_correct = 0
+        NP_NP_gold = len(gold_clusters[0])
+        for p_pair in predicted_clusters[0]:
+            for g_pair in gold_clusters[0]:
+                if p_pair[0] == g_pair[0] and p_pair[1] == g_pair[1]:
+                    NP_NP_correct += 1
+                    break
+                if p_pair[0] == g_pair[1] and p_pair[1] == g_pair[0]:
+                    NP_NP_correct += 1
+                    break
+
+        NP_P_predict = len(predicted_clusters[1])
+        NP_P_correct = 0
+        NP_P_gold = len(gold_clusters[1])
+        for p_pair in predicted_clusters[1]:
+            for g_pair in gold_clusters[1]:
+                if p_pair[0] == g_pair[0] and p_pair[1] == g_pair[1]:
+                    NP_P_correct += 1
+                    break
+                if p_pair[0] == g_pair[1] and p_pair[1] == g_pair[0]:
+                    NP_P_correct += 1
+                    break
+
+        P_P_predict = len(predicted_clusters[1])
+        P_P_correct = 0
+        P_P_gold = len(gold_clusters[1])
+        for p_pair in predicted_clusters[2]:
+            for g_pair in gold_clusters[2]:
+                if p_pair[0] == g_pair[0] and p_pair[1] == g_pair[1]:
+                    P_P_correct += 1
+                    break
+                if p_pair[0] == g_pair[1] and p_pair[1] == g_pair[0]:
+                    P_P_correct += 1
+                    break
+        return NP_NP_predict, NP_NP_correct, NP_NP_gold, NP_P_predict, NP_P_correct, NP_P_gold, P_P_predict, P_P_correct, P_P_gold
+
     def evaluate_external_data(self, session, evaluation_data, official_stdout=False):
         def load_data_by_line(example):
             return self.tensorize_example(example, is_training=False), example
+
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
         print("Loaded {} eval examples.".format(len(self.eval_data)))
 
-        coref_predictions = {}
-        coref_evaluator = metrics.CorefEvaluator()
+        all_NP_NP_predict_pair_counter = 0
+        all_NP_NP_correct_pair_counter = 0
+        all_NP_NP_gold_pair_counter = 0
+
+        all_NP_P_predict_pair_counter = 0
+        all_NP_P_correct_pair_counter = 0
+        all_NP_P_gold_pair_counter = 0
+
+        all_P_P_predict_pair_counter = 0
+        all_P_P_correct_pair_counter = 0
+        all_P_P_gold_pair_counter = 0
 
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
@@ -651,9 +734,20 @@ class CorefModel(object):
             candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
-            coref_predictions[example["doc_key"]] = self.evaluate_coref(top_span_starts, top_span_ends,
-                                                                        predicted_antecedents, example["clusters"],
-                                                                        coref_evaluator)
+            predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
+            NP_NP_predict, NP_NP_correct, NP_NP_gold, NP_P_predict, NP_P_correct, NP_P_gold, P_P_predict, P_P_correct, P_P_gold = self.evaluate_pairwise_coref(
+                predicted_clusters, (example['NP_NP_clusters'], example['NP_P_clusters'], example['P_P_clusters']))
+            all_NP_NP_predict_pair_counter += NP_NP_predict
+            all_NP_NP_correct_pair_counter += NP_NP_correct
+            all_NP_NP_gold_pair_counter += NP_NP_gold
+
+            all_NP_P_predict_pair_counter += NP_P_predict
+            all_NP_P_correct_pair_counter += NP_P_correct
+            all_NP_P_gold_pair_counter += NP_P_gold
+
+            all_P_P_predict_pair_counter += P_P_predict
+            all_P_P_correct_pair_counter += P_P_correct
+            all_P_P_gold_pair_counter += P_P_gold
             if example_num % 10 == 0:
                 print("Evaluated {}/{} examples.".format(example_num + 1, len(self.eval_data)))
         #
@@ -663,10 +757,34 @@ class CorefModel(object):
         # summary_dict["Average F1 (conll)"] = average_f1
         # print("Average F1 (conll): {:.2f}%".format(average_f1))
 
-        p, r, f = coref_evaluator.get_prf()
+        # p, r, f = coref_evaluator.get_prf()
         # summary_dict["Average F1 (py)"] = f
-        print("Average F1 (py): {:.2f}%".format(f * 100))
+        NP_NP_p = all_NP_NP_correct_pair_counter / all_NP_NP_predict_pair_counter
+        NP_NP_r = all_NP_NP_correct_pair_counter / all_NP_NP_gold_pair_counter
+        NP_NP_f = 2 * NP_NP_p * NP_NP_r / (NP_NP_p + NP_NP_r)
+        print('NP-NP:')
+        print("Average F1 (py): {:.2f}%".format(NP_NP_f*100))
         # summary_dict["Average precision (py)"] = p
-        print("Average precision (py): {:.2f}%".format(p * 100))
+        print("Average precision (py): {:.2f}%".format(NP_NP_p * 100))
         # summary_dict["Average recall (py)"] = r
-        print("Average recall (py): {:.2f}%".format(r * 100))
+        print("Average recall (py): {:.2f}%".format(NP_NP_r * 100))
+
+        NP_P_p = all_NP_P_correct_pair_counter / all_NP_P_predict_pair_counter
+        NP_P_r = all_NP_P_correct_pair_counter / all_NP_P_gold_pair_counter
+        NP_P_f = 2 * NP_P_p * NP_P_r / (NP_P_p + NP_P_r)
+        print('NP-P:')
+        print("Average F1 (py): {:.2f}%".format(NP_P_f * 100))
+        # summary_dict["Average precision (py)"] = p
+        print("Average precision (py): {:.2f}%".format(NP_P_p * 100))
+        # summary_dict["Average recall (py)"] = r
+        print("Average recall (py): {:.2f}%".format(NP_P_r * 100))
+
+        P_P_p = all_P_P_correct_pair_counter / all_P_P_predict_pair_counter
+        P_P_r = all_P_P_correct_pair_counter / all_P_P_gold_pair_counter
+        P_P_f = 2 * P_P_p * P_P_r / (P_P_p + P_P_r)
+        print('P-P:')
+        print("Average F1 (py): {:.2f}%".format(P_P_f * 100))
+        # summary_dict["Average precision (py)"] = p
+        print("Average precision (py): {:.2f}%".format(P_P_p * 100))
+        # summary_dict["Average recall (py)"] = r
+        print("Average recall (py): {:.2f}%".format(P_P_r * 100))
