@@ -17,7 +17,7 @@ import util
 #     model.restore(session)
 #     model.evaluate(session, official_stdout=True)
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'she', 'her', 'he', 'him', 'it', 'them', 'they']
     relative_pronouns = ['that', 'which', 'who', 'whom', 'whose', 'whichever', 'whoever', 'whomever']
     demonstrative_pronouns = ['this', 'these', 'that', 'those']
