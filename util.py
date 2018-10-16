@@ -285,15 +285,7 @@ class CustomLSTMCell(tf.contrib.rnn.RNNCell):
         return _initializer
 
 
-def clean_sentence_for_parsing(input_sentence):
-    valid_chars = """qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*/?., ;:"'"""
-    new_sentence = ''
-    for char in input_sentence:
-        if char in valid_chars:
-            new_sentence += char
-        else:
-            new_sentence += '\n'
-    return new_sentence
+
 
 
 personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'she', 'her', 'he', 'him', 'it', 'them', 'they', 'Me', 'We', 'Us',

@@ -2,10 +2,21 @@ import os
 # import tensorflow as tf
 # import coref_model as cm
 # import util
-from util import *
+# from util import *
 import ujson as json
 from pycorenlp import StanfordCoreNLP
 from tqdm import tqdm
+from multiprocessing import Pool
+
+def clean_sentence_for_parsing(input_sentence):
+    valid_chars = """qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*/?., ;:"'"""
+    new_sentence = ''
+    for char in input_sentence:
+        if char in valid_chars:
+            new_sentence += char
+        else:
+            new_sentence += '\n'
+    return new_sentence
 
 nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(10)]
 tmp_nlp_list = [StanfordCoreNLP('http://localhost:90%d' % (i + 10)) for i in range(5)]
@@ -110,7 +121,7 @@ for i, tmp_example in enumerate(all_data):
                     continue
                 governor_position = relation['governor']
                 dependent_position = relation['dependent']
-                if governor_position + Before_length == sentence_position or dependent_position + Before_length == sentence_position:
+                if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
                     stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
                                                     s['tokens'][governor_position - 1]['pos']), relation['dep'], (
                                                        dependent_position, s['tokens'][dependent_position - 1]['lemma'],
@@ -123,6 +134,20 @@ for i, tmp_example in enumerate(all_data):
 with open('test_data_for_analyzing.json', 'w') as f:
     json.dump(all_test_data, f)
 
+# def get_coverage(w_list1, w_list2):
+#     tmp_count = 0
+#     for w in w_list1:
+#         if w in w_list2:
+#             tmp_count += 1
+#     return tmp_count/len(w_list1)
+#
+# def verify_match(coreference_pair, OMCS_pair, limitation=0.5):
+#     if get_coverage(coreference_pair[0], OMCS_pair[0]) > limitation and get_coverage(coreference_pair[1], OMCS_pair[1]) > limitation:
+#         return True
+#     if get_coverage(coreference_pair[0], OMCS_pair[1]) > limitation and get_coverage(coreference_pair[1], OMCS_pair[0]) > limitation:
+#         return True
+#     return False
+#
 # with open('test_data_for_analyzing.json', 'r') as f:
 #     all_test_data = json.load(f)
 #
@@ -130,7 +155,33 @@ with open('test_data_for_analyzing.json', 'w') as f:
 # with open('OMCS/new_omcs600.txt', 'r') as f:
 #     for line in f:
 #         words = line.split('\t')
-#         OMCS_data.append((words[1].split(' '), words[2].split(' ')))
+#         OMCS_data.append((words[0], words[1].split(' '), words[2].split(' ')))
+#
+#
+# def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
+#     print('We are working on example:', example_id, '/', 348)
+#     for NP_P_pair in tmp_data:
+#         NP = NP_P_pair['NP'][1]
+#         for edge in NP_P_pair['pronoun_related_edge']:
+#             if edge[0][1] in all_pronouns:
+#                 tmp_other_word = edge[2][1]
+#             else:
+#                 tmp_other_word = edge[0][1]
+#             for pair in OMCS_data:
+#                 if verify_match((NP, tmp_other_word), pair[1:]):
+#                     print('lalala')
+#
+#
+# match_result = dict()
+#
+# example_and_ids = list()
+# for i, tmp_data in enumerate(all_test_data):
+#     example_and_ids.append((tmp_data, i))
+#
+# workers = Pool(30)
+# for example_and_id in example_and_ids:
+#     workers.apply_async(find_OMCS_match_for_a_coreference_pair, args=(example_and_id[0], example_and_id[1], ))
+
 
 
 
