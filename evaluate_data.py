@@ -187,7 +187,7 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
             if found_match:
                 found_match_pair += 1
                 break
-    print('Found_match:', found_match_pair, '/', len(tmp_data), found_match_pair/len(tmp_data))
+    print('File', example_id, 'Found_match:', found_match_pair, '/', len(tmp_data), found_match_pair/len(tmp_data))
     return found_match_pair, len(tmp_data)
 
 
