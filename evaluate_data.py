@@ -43,7 +43,8 @@ with open('test.english.jsonlines', 'r') as f:
     all_data = list()
     for line in f:
         all_data.append(json.loads(line))
-    for tmp_example in tqdm(all_data):
+    for i, tmp_example in enumerate(all_data):
+        print('We are working on data:', i, '/', len(all_data))
         all_sentence = list()
         separate_sentence_range = list()
         for s in tmp_example['sentences']:
@@ -78,7 +79,7 @@ with open('test.english.jsonlines', 'r') as f:
                                 NP_NP_clusters.append((tuple(c[i][0]), tuple(c[j][0])))
 
         tmp_data_to_analyze = list()
-        for pair in NP_P_clusters:
+        for pair in tqdm(NP_P_clusters):
             NP_position = pair[0]
             Pronoun_position = pair[1]
             NP = all_sentence[NP_position[0]:NP_position[1] + 1]
