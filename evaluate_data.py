@@ -110,25 +110,27 @@ for i, tmp_example in enumerate(all_data):
                     continue
                 governor_position = relation['governor']
                 dependent_position = relation['dependent']
-                if governor_position + Before_length == Pronoun_position or dependent_position + Before_length == Pronoun_position:
+                if governor_position + Before_length == sentence_position or dependent_position + Before_length == sentence_position:
                     stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
                                                     s['tokens'][governor_position - 1]['pos']), relation['dep'], (
                                                        dependent_position, s['tokens'][dependent_position - 1]['lemma'],
                                                        s['tokens'][dependent_position - 1]['pos'])))
+            Before_length += len(s['tokens'])
+        print(len(stored_dependency_list))
         tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
     all_test_data.append(tmp_data_to_analyze)
 
 with open('test_data_for_analyzing.json', 'w') as f:
     json.dump(all_test_data, f)
 
-with open('test_data_for_analyzing.json', 'r') as f:
-    all_test_data = json.load(f)
-
-OMCS_data = list()
-with open('OMCS/new_omcs600.txt', 'r') as f:
-    for line in f:
-        words = line.split('\t')
-        OMCS_data.append((words[1].split(' '), words[2].split(' ')))
+# with open('test_data_for_analyzing.json', 'r') as f:
+#     all_test_data = json.load(f)
+#
+# OMCS_data = list()
+# with open('OMCS/new_omcs600.txt', 'r') as f:
+#     for line in f:
+#         words = line.split('\t')
+#         OMCS_data.append((words[1].split(' '), words[2].split(' ')))
 
 
 
