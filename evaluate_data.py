@@ -116,7 +116,7 @@ for i, tmp_example in enumerate(all_data):
                                                        dependent_position, s['tokens'][dependent_position - 1]['lemma'],
                                                        s['tokens'][dependent_position - 1]['pos'])))
             Before_length += len(s['tokens'])
-        print(len(stored_dependency_list))
+        # print(len(stored_dependency_list))
         tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
     all_test_data.append(tmp_data_to_analyze)
 
