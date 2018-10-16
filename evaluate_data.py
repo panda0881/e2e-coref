@@ -5,6 +5,7 @@ import os
 from util import *
 import ujson as json
 from pycorenlp import StanfordCoreNLP
+from tqdm import tqdm
 
 nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(10)]
 tmp_nlp_list = [StanfordCoreNLP('http://localhost:90%d' % (i + 10)) for i in range(5)]
@@ -39,8 +40,10 @@ all_pronouns = set(all_pronouns)
 all_test_data = list()
 
 with open('test.english.jsonlines', 'r') as f:
+    all_data = list()
     for line in f:
-        tmp_example = json.loads(line)
+        all_data.append(json.loads(line))
+    for tmp_example in tqdm(all_data):
         all_sentence = list()
         separate_sentence_range = list()
         for s in tmp_example['sentences']:
