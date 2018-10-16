@@ -284,6 +284,7 @@ class CustomLSTMCell(tf.contrib.rnn.RNNCell):
 
         return _initializer
 
+
 def clean_sentence_for_parsing(input_sentence):
     valid_chars = """qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*/?., ;:"'"""
     new_sentence = ''
@@ -295,16 +296,23 @@ def clean_sentence_for_parsing(input_sentence):
     return new_sentence
 
 
-personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'she', 'her', 'he', 'him', 'it', 'them', 'they']
-relative_pronouns = ['that', 'which', 'who', 'whom', 'whose', 'whichever', 'whoever', 'whomever']
-demonstrative_pronouns = ['this', 'these', 'that', 'those']
+personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'she', 'her', 'he', 'him', 'it', 'them', 'they', 'Me', 'We', 'Us',
+                     'You', 'She', 'Her', 'He', 'Him', 'It', 'Them', 'They']
+relative_pronouns = ['that', 'which', 'who', 'whom', 'whose', 'whichever', 'whoever', 'whomever',
+                     'That', 'Which', 'Who', 'Whom', 'Whose', 'Whichever', 'Whoever', 'Whomever']
+demonstrative_pronouns = ['this', 'these', 'that', 'those', 'This', 'These', 'That', 'Those']
 indefinite_pronouns = ['anybody', 'anyone', 'anything', 'each', 'either', 'everybody', 'everyone', 'everything',
-                       'neither', 'nobody', 'noone', 'nothing', 'one', 'somebody', 'someone', 'something', 'both',
-                       'few', 'many', 'several', 'all', 'any', 'most', ' none', 'some']
-reflexive_pronouns = ['myself', 'ourselves', 'yourself', 'yourselves', 'himself', 'herself', 'itself', 'themselves']
-interrogative_pronouns = ['what', 'who', 'which', 'whom', 'whose']
+                       'neither', 'nobody', 'none', 'nothing', 'one', 'somebody', 'someone', 'something', 'both',
+                       'few', 'many', 'several', 'all', 'any', 'most', 'some',
+                       'Anybody', 'Anyone', 'Anything', 'Each', 'Either', 'Everybody', 'Everyone', 'Everything',
+                       'Neither', 'Nobody', 'None', 'Nothing', 'One', 'Somebody', 'Someone', 'Something', 'Both',
+                       'Few', 'Many', 'Several', 'All', 'Any', 'Most', 'Some']
+reflexive_pronouns = ['myself', 'ourselves', 'yourself', 'yourselves', 'himself', 'herself', 'itself', 'themselves',
+                      'Myself', 'Ourselves', 'Yourself', 'Yourselves', 'Himself', 'Herself', 'Itself', 'Themselves']
+interrogative_pronouns = ['what', 'who', 'which', 'whom', 'whose', 'What', 'Who', 'Which', 'Whom', 'Whose']
 possessive_pronoun = ['my', 'your', 'his', 'her', 'its', 'our', 'your', 'their', 'mine', 'yours', 'his', 'hers', 'ours',
-                      'yours', 'theirs']
+                      'yours', 'theirs', 'My', 'Your', 'His', 'Her', 'Its', 'Our', 'Your', 'Their', 'Mine', 'Yours',
+                      'His', 'Hers', 'Ours', 'Yours', 'Theirs']
 
 all_pronouns_by_type = dict()
 all_pronouns_by_type['personal'] = personal_pronouns
