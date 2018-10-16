@@ -137,10 +137,11 @@ all_pronouns = set(all_pronouns)
 
 
 
-
-
-
-
+stop_words = list()
+with open('nltk_english.txt', 'r') as f:
+    for line in f:
+        stop_words.append(line[:-1])
+stop_words = set(stop_words)
 
 with open('test_data_for_analyzing.json', 'r') as f:
     all_test_data = json.load(f)
@@ -151,6 +152,14 @@ with open('OMCS/new_omcs600.txt', 'r', encoding='utf-8') as f:
         words = line.split('\t')
         OMCS_data.append((words[0], words[1].split(' '), words[2].split(' ')))
 
+
+def filter_stop_words(input_sentence, stop_words):
+    result = list()
+    for w in input_sentence:
+        if w in stop_words:
+            continue
+        result.append(w)
+    return  result
 
 
 def get_coverage(w_list1, w_list2):
@@ -181,7 +190,7 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
                 tmp_other_word = edge[0][1]
             found_match = False
             for pair in OMCS_data:
-                if verify_match((NP, [tmp_other_word]), pair[1:]):
+                if verify_match((filter_stop_words(NP, stop_words), [tmp_other_word]), pair[1:]):
                     found_match = True
                     break
             if found_match:
