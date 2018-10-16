@@ -142,7 +142,14 @@ all_pronouns = set(all_pronouns)
 
 
 
+with open('test_data_for_analyzing.json', 'r') as f:
+    all_test_data = json.load(f)
 
+OMCS_data = list()
+with open('OMCS/new_omcs600.txt', 'r', encoding='utf-8') as f:
+    for line in f:
+        words = line.split('\t')
+        OMCS_data.append((words[0], words[1].split(' '), words[2].split(' ')))
 
 
 
@@ -151,26 +158,16 @@ def get_coverage(w_list1, w_list2):
     for w in w_list1:
         if w in w_list2:
             tmp_count += 1
+    # if tmp_count > 0:
+    #     print('')
     return tmp_count/len(w_list1)
 
 def verify_match(coreference_pair, OMCS_pair, limitation=0.5):
-    if get_coverage(coreference_pair[0], OMCS_pair[0]) > limitation and get_coverage(coreference_pair[1], OMCS_pair[1]) > limitation:
+    if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1], OMCS_pair[1]) >= limitation:
         return True
-    if get_coverage(coreference_pair[0], OMCS_pair[1]) > limitation and get_coverage(coreference_pair[1], OMCS_pair[0]) > limitation:
+    if get_coverage(coreference_pair[0], OMCS_pair[1]) >= limitation and get_coverage(coreference_pair[1], OMCS_pair[0]) >= limitation:
         return True
     return False
-
-with open('test_data_for_analyzing.json', 'r') as f:
-    all_test_data = json.load(f)
-
-OMCS_data = list()
-st = time.time()
-with open('OMCS/new_omcs600.txt', 'r') as f:
-    for line in f:
-        words = line.split('\t')
-        OMCS_data.append((words[0], words[1].split(' '), words[2].split(' ')))
-print("Finished in {:.2f}".format(time.time() - st))
-
 
 def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
     print('We are working on example:', example_id, '/', 348)
@@ -184,7 +181,7 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
                 tmp_other_word = edge[0][1]
             found_match = False
             for pair in OMCS_data:
-                if verify_match((NP, tmp_other_word), pair[1:]):
+                if verify_match((NP, [tmp_other_word]), pair[1:]):
                     found_match = True
                     break
             if found_match:
@@ -197,7 +194,7 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
 def get_match_dict(tmp_data, example_id):
     print('We are working on example:', example_id, '/', 348)
     found_match_pair = 0
-    for NP_P_pair in tmp_data:
+    for NP_P_pair in tqdm(tmp_data):
         NP = NP_P_pair['NP'][1]
         for edge in NP_P_pair['pronoun_related_edge']:
             if edge[0][1] in all_pronouns:
@@ -212,7 +209,7 @@ def get_match_dict(tmp_data, example_id):
             if found_match:
                 found_match_pair += 1
                 break
-    print('Found_match:', found_match_pair, '/', len(tmp_data), found_match_pair/len(tmp_data))
+    print('File', example_id, 'found_match:', found_match_pair, '/', len(tmp_data), found_match_pair/len(tmp_data))
     return found_match_pair, len(tmp_data)
 
 
@@ -230,6 +227,8 @@ for example_and_id in example_and_ids:
 workers.close()
 workers.join()
 raw_results = [tmp_result.get() for tmp_result in raw_results]
+
+# test_result = find_OMCS_match_for_a_coreference_pair(example_and_ids[0][0], example_and_ids[0][1])
 
 all_matched_pairs = 0
 all_pairs = 0
