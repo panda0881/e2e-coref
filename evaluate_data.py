@@ -2,7 +2,7 @@ import os
 # import tensorflow as tf
 # import coref_model as cm
 # import util
-# from util import *
+from util import *
 import ujson as json
 from pycorenlp import StanfordCoreNLP
 from tqdm import tqdm

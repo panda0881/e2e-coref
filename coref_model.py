@@ -777,6 +777,7 @@ class CorefModel(object):
         print("Average precision (py): {:.2f}%".format(NP_NP_p * 100))
         # summary_dict["Average recall (py)"] = r
         print("Average recall (py): {:.2f}%".format(NP_NP_r * 100))
+        print(all_NP_NP_correct_pair_counter, '/', all_NP_NP_gold_pair_counter)
 
         NP_P_p = all_NP_P_correct_pair_counter / all_NP_P_predict_pair_counter
         NP_P_r = all_NP_P_correct_pair_counter / all_NP_P_gold_pair_counter
@@ -787,6 +788,7 @@ class CorefModel(object):
         print("Average precision (py): {:.2f}%".format(NP_P_p * 100))
         # summary_dict["Average recall (py)"] = r
         print("Average recall (py): {:.2f}%".format(NP_P_r * 100))
+        print(all_NP_P_correct_pair_counter, '/', all_NP_P_gold_pair_counter)
 
         P_P_p = all_P_P_correct_pair_counter / all_P_P_predict_pair_counter
         P_P_r = all_P_P_correct_pair_counter / all_P_P_gold_pair_counter
@@ -797,3 +799,4 @@ class CorefModel(object):
         print("Average precision (py): {:.2f}%".format(P_P_p * 100))
         # summary_dict["Average recall (py)"] = r
         print("Average recall (py): {:.2f}%".format(P_P_r * 100))
+        print(all_P_P_correct_pair_counter, '/', all_P_P_gold_pair_counter)
