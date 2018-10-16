@@ -202,6 +202,9 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
 
 def get_match_dict(tmp_data, example_id):
     print('We are working on example:', example_id, '/', 348)
+    if len(tmp_data) == 0:
+        print('This example has no valid data')
+        return 0, 0
     found_match_pair = 0
     for NP_P_pair in tqdm(tmp_data):
         NP = NP_P_pair['NP'][1]
