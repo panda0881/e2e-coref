@@ -695,9 +695,9 @@ class CorefModel(object):
                     NP_P_correct += 1
                     break
 
-        P_P_predict = len(predicted_clusters[1])
+        P_P_predict = len(predicted_clusters[2])
         P_P_correct = 0
-        P_P_gold = len(gold_clusters[1])
+        P_P_gold = len(gold_clusters[2])
         for p_pair in predicted_clusters[2]:
             for g_pair in gold_clusters[2]:
                 if p_pair[0] == g_pair[0] and p_pair[1] == g_pair[1]:
