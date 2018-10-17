@@ -9,6 +9,7 @@ from tqdm import tqdm
 from multiprocessing import Pool
 import time
 
+
 def clean_sentence_for_parsing(input_sentence):
     valid_chars = """qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*/?., ;:"'"""
     new_sentence = ''
@@ -18,6 +19,7 @@ def clean_sentence_for_parsing(input_sentence):
         else:
             new_sentence += '\n'
     return new_sentence
+
 
 nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(10)]
 tmp_nlp_list = [StanfordCoreNLP('http://localhost:90%d' % (i + 10)) for i in range(5)]
@@ -136,7 +138,6 @@ all_pronouns = set(all_pronouns)
 #     json.dump(all_test_data, f)
 
 
-
 stop_words = list()
 with open('nltk_english.txt', 'r') as f:
     for line in f:
@@ -159,7 +160,7 @@ def filter_stop_words(input_sentence, stop_words):
         if w in stop_words:
             continue
         result.append(w)
-    return  result
+    return result
 
 
 def get_coverage(w_list1, w_list2):
@@ -169,14 +170,18 @@ def get_coverage(w_list1, w_list2):
             tmp_count += 1
     # if tmp_count > 0:
     #     print('')
-    return tmp_count/len(w_list1)
+    return tmp_count / len(w_list1)
+
 
 def verify_match(coreference_pair, OMCS_pair, limitation=0.5):
-    if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1], OMCS_pair[1]) >= limitation:
+    if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1],
+                                                                                      OMCS_pair[1]) >= limitation:
         return True
-    if get_coverage(coreference_pair[0], OMCS_pair[1]) >= limitation and get_coverage(coreference_pair[1], OMCS_pair[0]) >= limitation:
+    if get_coverage(coreference_pair[0], OMCS_pair[1]) >= limitation and get_coverage(coreference_pair[1],
+                                                                                      OMCS_pair[0]) >= limitation:
         return True
     return False
+
 
 def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
     print('We are working on example:', example_id, '/', 348)
@@ -196,7 +201,7 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
             if found_match:
                 found_match_pair += 1
                 break
-    print('File', example_id, 'Found_match:', found_match_pair, '/', len(tmp_data), found_match_pair/len(tmp_data))
+    print('File', example_id, 'Found_match:', found_match_pair, '/', len(tmp_data), found_match_pair / len(tmp_data))
     return found_match_pair, len(tmp_data)
 
 
@@ -205,7 +210,9 @@ def get_match_dict(tmp_data, example_id):
     if len(tmp_data) == 0:
         print('This example has no valid data')
         return 0, 0
-    found_match_pair = 0
+    local_dict = dict()
+    for edge in OMCS_edges:
+        local_dict[edge] = dict()
     for NP_P_pair in tqdm(tmp_data):
         NP = NP_P_pair['NP'][1]
         for edge in NP_P_pair['pronoun_related_edge']:
@@ -213,17 +220,19 @@ def get_match_dict(tmp_data, example_id):
                 tmp_other_word = edge[2][1]
             else:
                 tmp_other_word = edge[0][1]
-            found_match = False
             for pair in OMCS_data:
-                if verify_match((NP, tmp_other_word), pair[1:]):
-                    found_match = True
-                    break
-            if found_match:
-                found_match_pair += 1
-                break
-    print('File', example_id, 'found_match:', found_match_pair, '/', len(tmp_data), found_match_pair/len(tmp_data))
-    return found_match_pair, len(tmp_data)
+                if verify_match((NP, tmp_other_word), pair[1:]) and pair[0] in OMCS_edges:
+                    if edge[1] not in local_dict[pair[0]]:
+                        local_dict[pair[0]][edge[1]] = 0
+                    local_dict[pair[0]][edge[1]] += 1
+    print('File', example_id, 'finished')
+    return local_dict
 
+
+OMCS_edges = ['AtLocation', 'UsedFor', 'IsA', 'CapableOf', 'HasPrerequisite', 'HasProperty', 'Causes', 'HasA',
+              'MotivatedByGoal', 'Desires', 'CausesDesire', 'PartOf', 'ReceivesAction', 'MadeOf', 'DefinedAs',
+              'HasFirstSubevent', 'HasLastSubevent', 'RelatedTo', 'CreatedBy', 'SymbolOf', 'InstanceOf', 'HasSubevent',
+              'InheritsFrom', 'LocatedNear', 'HasPainIntensity', 'HasPainCharacter', 'DesireOf', 'LocationOfAction']
 
 match_result = dict()
 
@@ -232,24 +241,52 @@ for i, tmp_data in enumerate(all_test_data):
     example_and_ids.append((tmp_data, i))
 
 workers = Pool(30)
-raw_results = list()
+# raw_results = list()
+# for example_and_id in example_and_ids:
+#     tmp_result = workers.apply_async(find_OMCS_match_for_a_coreference_pair,
+#                                      args=(example_and_id[0], example_and_id[1],))
+#     raw_results.append(tmp_result)
+# workers.close()
+# workers.join()
+# raw_results = [tmp_result.get() for tmp_result in raw_results]
+
+# all_matched_pairs = 0
+# all_pairs = 0
+#
+# for p in raw_results:
+#     all_matched_pairs += p[0]
+#     all_pairs += p[1]
+#
+# print(all_matched_pairs, all_pairs, all_matched_pairs / all_pairs)
+
+
+raw_dicts = list()
 for example_and_id in example_and_ids:
-    tmp_result = workers.apply_async(find_OMCS_match_for_a_coreference_pair, args=(example_and_id[0], example_and_id[1], ))
-    raw_results.append(tmp_result)
+    tmp_dict = workers.apply_async(get_match_dict, args=(example_and_id[0], example_and_id[1],))
+    raw_dicts.append(tmp_dict)
 workers.close()
 workers.join()
-raw_results = [tmp_result.get() for tmp_result in raw_results]
+raw_dicts = [tmp_dict.get() for tmp_dict in raw_dicts]
+
+
+print('Start to merge dict')
+final_dict = dict()
+for edge in OMCS_edges:
+    final_dict[edge] = dict()
+
+for tmp_dict in tqdm(raw_dicts):
+    for edge in OMCS_edges:
+        for dep_edge in tmp_dict[edge]:
+            if dep_edge not in final_dict[edge]:
+                final_dict[edge] = 0
+            final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+
+with open('OMCS-coverage-dict.json', 'w') as f:
+    json.dump(final_dict, f)
+
 
 # test_result = find_OMCS_match_for_a_coreference_pair(example_and_ids[0][0], example_and_ids[0][1])
 
-all_matched_pairs = 0
-all_pairs = 0
-
-for p in raw_results:
-    all_matched_pairs += p[0]
-    all_pairs += p[1]
-
-print(all_matched_pairs, all_pairs, all_matched_pairs/all_pairs)
 
 
 
