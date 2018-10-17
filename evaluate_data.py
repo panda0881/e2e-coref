@@ -164,6 +164,8 @@ def filter_stop_words(input_sentence, stop_words):
 
 
 def get_coverage(w_list1, w_list2):
+    if len(w_list1) == 0:
+        return 0
     tmp_count = 0
     for w in w_list1:
         if w in w_list2:
@@ -278,11 +280,19 @@ for edge in OMCS_edges:
     final_dict[edge] = dict()
 
 for tmp_dict in tqdm(raw_dicts):
-    for edge in OMCS_edges:
-        for dep_edge in tmp_dict[edge]:
-            if dep_edge not in final_dict[edge]:
-                final_dict[edge] = 0
-            final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+    try:
+        for edge in OMCS_edges:
+            for dep_edge in tmp_dict[edge]:
+                if dep_edge not in final_dict[edge]:
+                    final_dict[edge] = 0
+                final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+    except:
+        print(tmp_dict)
+        for edge in OMCS_edges:
+            for dep_edge in tmp_dict[edge]:
+                if dep_edge not in final_dict[edge]:
+                    final_dict[edge] = 0
+                final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
 
 with open('OMCS-coverage-dict.json', 'w') as f:
     json.dump(final_dict, f)
