@@ -213,7 +213,7 @@ def get_match_dict(tmp_data, example_id):
     local_dict = dict()
     for edge in OMCS_edges:
         local_dict[edge] = dict()
-    for NP_P_pair in tqdm(tmp_data):
+    for NP_P_pair in tmp_data:
         NP = NP_P_pair['NP'][1]
         for edge in NP_P_pair['pronoun_related_edge']:
             if edge[0][1] in all_pronouns:
