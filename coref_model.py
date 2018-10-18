@@ -332,10 +332,10 @@ class CorefModel(object):
 
         candidate_span_emb = self.get_span_emb(flattened_head_emb, context_outputs, candidate_starts,
                                                candidate_ends)  # [num_candidates, emb]
-        candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
-        candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
+        # candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
+        # candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
 
-        # candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts, gold_ends)
+        candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts, gold_ends)
 
         k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
         top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
@@ -447,19 +447,19 @@ class CorefModel(object):
         same_end = tf.equal(tf.expand_dims(gold_ends, 1),
                             tf.expand_dims(candidate_ends, 0))  # [num_labeled, num_candidates]
         same_span = tf.logical_and(same_start, same_end)  # [num_labeled, num_candidates]
-        candidate_labels = tf.matmul(tf.expand_dims(labels, 0), tf.to_int32(same_span))  # [1, num_candidates]
-        candidate_labels = tf.squeeze(candidate_labels, 0)  # [num_candidates]
-        return candidate_labels
-        gold_mention_pairs = list()
-        for i in range(tf.shape(gold_starts)[0].eval()):
-            gold_mention_pairs.append((gold_starts[i].eval(), gold_ends[i].eval()))
-        scores = list()
-        for i in range(tf.shape(candidate_starts)[0].eval()):
-            if (candidate_starts[i].eval(), candidate_ends[i].eval()) in gold_mention_pairs:
-                scores.append(1)
-            else:
-                scores.append(0)
-        return tf.convert_to_tensor(gold_mention_pairs, dtype=tf.float32)
+        return tf.reduce_sum(tf.cast(same_span, tf.float32))
+
+        # return candidate_labels
+        # gold_mention_pairs = list()
+        # for i in range(tf.shape(gold_starts)[0].eval()):
+        #     gold_mention_pairs.append((gold_starts[i].eval(), gold_ends[i].eval()))
+        # scores = list()
+        # for i in range(tf.shape(candidate_starts)[0].eval()):
+        #     if (candidate_starts[i].eval(), candidate_ends[i].eval()) in gold_mention_pairs:
+        #         scores.append(1)
+        #     else:
+        #         scores.append(0)
+        # return tf.convert_to_tensor(gold_mention_pairs, dtype=tf.float32)
 
     def softmax_loss(self, antecedent_scores, antecedent_labels):
         gold_scores = antecedent_scores + tf.log(tf.to_float(antecedent_labels))  # [k, max_ant + 1]
