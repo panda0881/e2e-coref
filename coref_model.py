@@ -320,13 +320,14 @@ class CorefModel(object):
         candidate_starts = tf.boolean_mask(tf.reshape(candidate_starts, [-1]),
                                            flattened_candidate_mask)  # [num_candidates]
         candidate_ends = tf.boolean_mask(tf.reshape(candidate_ends, [-1]), flattened_candidate_mask)  # [num_candidates]
+        candidate_starts = gold_starts
+        candidate_ends = gold_ends
         candidate_sentence_indices = tf.boolean_mask(tf.reshape(candidate_start_sentence_indices, [-1]),
                                                      flattened_candidate_mask)  # [num_candidates]
 
         candidate_cluster_ids = self.get_candidate_labels(candidate_starts, candidate_ends, gold_starts, gold_ends,
                                                           cluster_ids)  # [num_candidates]
-        candidate_starts = gold_starts
-        candidate_ends = gold_ends
+
         candidate_span_emb = self.get_span_emb(flattened_head_emb, context_outputs, candidate_starts,
                                                candidate_ends)  # [num_candidates, emb]
         candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
