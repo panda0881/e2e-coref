@@ -439,11 +439,11 @@ class CorefModel(object):
 
     def pseudo_get_mention_scores(self, candidate_starts, candidate_ends, gold_starts, gold_ends):
         gold_mention_pairs = list()
-        for i in range(tf.shape(gold_starts)[0]):
-            gold_mention_pairs.append((gold_starts[i], gold_ends[i]))
+        for i in range(tf.shape(gold_starts)[0].eval()):
+            gold_mention_pairs.append((gold_starts[i].eval(), gold_ends[i].eval()))
         scores = list()
-        for i in range(tf.shape(candidate_starts)[0]):
-            if (candidate_starts[i], candidate_ends[i]) in gold_mention_pairs:
+        for i in range(tf.shape(candidate_starts)[0].eval()):
+            if (candidate_starts[i].eval(), candidate_ends[i].eval()) in gold_mention_pairs:
                 scores.append(1)
             else:
                 scores.append(0)
