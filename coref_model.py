@@ -318,11 +318,11 @@ class CorefModel(object):
         candidate_mask = tf.logical_and(candidate_ends < num_words, tf.equal(candidate_start_sentence_indices,
                                                                              candidate_end_sentence_indices))  # [num_words, max_span_width]
         flattened_candidate_mask = tf.reshape(candidate_mask, [-1])  # [num_words * max_span_width]
-        # candidate_starts = tf.boolean_mask(tf.reshape(candidate_starts, [-1]),
-        #                                    flattened_candidate_mask)  # [num_candidates]
-        # candidate_ends = tf.boolean_mask(tf.reshape(candidate_ends, [-1]), flattened_candidate_mask)  # [num_candidates]
-        candidate_starts = gold_starts
-        candidate_ends = gold_ends
+        candidate_starts = tf.boolean_mask(tf.reshape(candidate_starts, [-1]),
+                                           flattened_candidate_mask)  # [num_candidates]
+        candidate_ends = tf.boolean_mask(tf.reshape(candidate_ends, [-1]), flattened_candidate_mask)  # [num_candidates]
+        # candidate_starts = gold_starts
+        # candidate_ends = gold_ends
 
         candidate_sentence_indices = tf.boolean_mask(tf.reshape(candidate_start_sentence_indices, [-1]),
                                                      flattened_candidate_mask)  # [num_candidates]
