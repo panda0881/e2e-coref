@@ -328,8 +328,10 @@ class CorefModel(object):
 
         candidate_span_emb = self.get_span_emb(flattened_head_emb, context_outputs, candidate_starts,
                                                candidate_ends)  # [num_candidates, emb]
-        candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
-        candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
+        # candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
+        # candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
+
+        candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts, gold_ends)
 
         k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
         top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
@@ -434,6 +436,18 @@ class CorefModel(object):
     def get_mention_scores(self, span_emb):
         with tf.variable_scope("mention_scores"):
             return util.ffnn(span_emb, self.config["ffnn_depth"], self.config["ffnn_size"], 1, self.dropout)  # [k, 1]
+
+    def pseudo_get_mention_scores(self, candidate_starts, candidate_ends, gold_starts, gold_ends):
+        gold_mention_pairs = list()
+        for i in range(len(gold_starts)):
+            gold_mention_pairs.append((gold_starts[i], gold_ends[i]))
+        scores = list()
+        for i in range(len(candidate_starts)):
+            if (candidate_starts[i], candidate_ends[i]) in gold_mention_pairs:
+                scores.append(1)
+            else:
+                scores.append(0)
+        return tf.convert_to_tensor(gold_mention_pairs, dtype=tf.float32)
 
     def softmax_loss(self, antecedent_scores, antecedent_labels):
         gold_scores = antecedent_scores + tf.log(tf.to_float(antecedent_labels))  # [k, max_ant + 1]
