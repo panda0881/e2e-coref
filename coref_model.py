@@ -325,13 +325,14 @@ class CorefModel(object):
 
         candidate_cluster_ids = self.get_candidate_labels(candidate_starts, candidate_ends, gold_starts, gold_ends,
                                                           cluster_ids)  # [num_candidates]
-
+        candidate_starts = gold_starts
+        candidate_ends = gold_ends
         candidate_span_emb = self.get_span_emb(flattened_head_emb, context_outputs, candidate_starts,
                                                candidate_ends)  # [num_candidates, emb]
-        # candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
-        # candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
+        candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
+        candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
 
-        candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts, gold_ends)
+        # candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts, gold_ends)
 
         k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
         top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
