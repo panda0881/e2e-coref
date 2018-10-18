@@ -447,7 +447,7 @@ class CorefModel(object):
         same_end = tf.equal(tf.expand_dims(gold_ends, 1),
                             tf.expand_dims(candidate_ends, 0))  # [num_labeled, num_candidates]
         same_span = tf.logical_and(same_start, same_end)  # [num_labeled, num_candidates]
-        return tf.reduce_sum(tf.cast(same_span, tf.float32))
+        return tf.reduce_sum(tf.cast(same_span, tf.float32), 0)
 
         # return candidate_labels
         # gold_mention_pairs = list()
