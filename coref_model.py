@@ -681,8 +681,8 @@ class CorefModel(object):
             predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
             all_NPs = example['pronoun_coreference_info']['all_NP']
             for pronoun_type in interested_pronouns:
-                for pronoun_example in example['pronoun_coreference_info']['pronoun_dict']:
-                    print(pronoun_example)
+                for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
+                    # print(pronoun_example)
                     pronoun_span = pronoun_example['pronoun']
                     correct_NPs = pronoun_example['NPs']
                     pronoun_position = -1
@@ -704,8 +704,8 @@ class CorefModel(object):
             # print('shape:', top_span_starts.shape)
             # print('top_span_ends:', top_span_ends)
             # print('shape:', top_span_ends.shape)
-            # print('top_antecedents', top_antecedents)
-            # print('shape:', top_antecedents.shape)
+            print('top_antecedents', top_antecedents)
+            print('shape:', top_antecedents.shape)
             # print('top_antecedent_scores:', top_antecedent_scores)
             # print('shape:', top_antecedent_scores.shape)
             # print('predicated_antecedents:', predicted_antecedents)
