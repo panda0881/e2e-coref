@@ -669,7 +669,9 @@ class CorefModel(object):
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
         print("Loaded {} eval examples.".format(len(self.eval_data)))
-
+        coreference_result = dict()
+        for pronoun_type in interested_pronouns:
+            coreference_result[pronoun_type] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
@@ -677,26 +679,38 @@ class CorefModel(object):
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
             predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
-            # for pronoun_type in interested_pronouns:
-            #     for pronoun_example in example['pronoun_coreference_info']['pronoun_dict']:
-            #         pronoun_span = pronoun_example['pronoun']
-            #         correct_NPs = pronoun_example['NPs']
-            #         pronoun_position = -1
-            #         for i in range(top_span_starts.shape[0]):
-            #             if top_span_starts[i] == pronoun_span[0] and top_span_ends[i] == pronoun_span[1]:
-            #                 pronoun_position = i
+            all_NPs = example['pronoun_coreference_info']['all_NP']
+            for pronoun_type in interested_pronouns:
+                for pronoun_example in example['pronoun_coreference_info']['pronoun_dict']:
+                    pronoun_span = pronoun_example['pronoun']
+                    correct_NPs = pronoun_example['NPs']
+                    pronoun_position = -1
+                    for i in range(top_span_starts.shape[0]):
+                        if top_span_starts[i] == pronoun_span[0] and top_span_ends[i] == pronoun_span[1]:
+                            pronoun_position = i
+                            break
+                    if pronoun_position > 0:
+                        sorted_antecedents = top_antecedents[pronoun_position]
+                        for i in range(pronoun_position):
+                            if [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in all_NPs:
+                                coreference_result[pronoun_type]['all_coref'] += 1
+                                if [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in correct_NPs:
+                                    coreference_result[pronoun_type]['correct_coref'] += 1
+                                coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type]['correct_coref']/coreference_result[pronoun_type]['all_coref']
+                                break
 
-            print('top_span_starts:', top_span_starts)
-            print('shape:', top_span_starts.shape)
-            print('top_span_ends:', top_span_ends)
-            print('shape:', top_span_ends.shape)
-            print('top_antecedents', top_antecedents)
-            print('shape:', top_antecedents.shape)
-            print('top_antecedent_scores:', top_antecedent_scores)
-            print('shape:', top_antecedent_scores.shape)
-            print('predicated_antecedents:', predicted_antecedents)
-            print('tmp_data', example['pronoun_coreference_info'])
-            break
+            # print('top_span_starts:', top_span_starts)
+            # print('shape:', top_span_starts.shape)
+            # print('top_span_ends:', top_span_ends)
+            # print('shape:', top_span_ends.shape)
+            # print('top_antecedents', top_antecedents)
+            # print('shape:', top_antecedents.shape)
+            # print('top_antecedent_scores:', top_antecedent_scores)
+            # print('shape:', top_antecedent_scores.shape)
+            # print('predicated_antecedents:', predicted_antecedents)
+            # print('tmp_data', example['pronoun_coreference_info'])
+            print(coreference_result)
+            # break
 
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
