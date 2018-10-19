@@ -69,7 +69,7 @@ if __name__ == "__main__":
         model.restore(session)
 
         # print('we are working on NP-NP')
-        model.evaluate_pronoun_coreference(session, test_data, official_stdout=True)
+        model.evaluate_pronoun_coreference(session, test_data)
 
 # print(all_count)
 
