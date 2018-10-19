@@ -694,16 +694,17 @@ class CorefModel(object):
                     # print(pronoun_position)
                     if pronoun_position > 0:
                         # sorted_antecedents = top_antecedents[pronoun_position]
-                        antecedenc_to_score = dict()
+                        antecedence_to_score = dict()
                         for i in range(len(top_antecedents[pronoun_position])):
-                            antecedenc_to_score[top_antecedents[pronoun_position][i]] = top_antecedent_scores[pronoun_position][i+1]
-                        sorted_antecedents = sorted(antecedenc_to_score, key= lambda x: antecedenc_to_score[x], reverse=True)
+                            antecedence_to_score[str(top_antecedents[pronoun_position][i])] = top_antecedent_scores[pronoun_position][i+1]
+                        sorted_antecedents = sorted(antecedence_to_score, key= lambda x: antecedence_to_score[x], reverse=True)
                         for i in range(pronoun_position):
                             try:
-                                if sorted_antecedents[i] < pronoun_position and [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in all_NPs:
+                                tmp_NP_position = int(sorted_antecedents[i])
+                                if tmp_NP_position < pronoun_position and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
                                     # print(i)
                                     coreference_result[pronoun_type]['all_coref'] += 1
-                                    if [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in correct_NPs:
+                                    if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in correct_NPs:
                                         coreference_result[pronoun_type]['correct_coref'] += 1
                                     coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type]['correct_coref']/coreference_result[pronoun_type]['all_coref']
                                     break
@@ -721,12 +722,18 @@ class CorefModel(object):
                                 print(pronoun_position)
                                 print(i)
                                 print(sorted_antecedents[i])
-                                if sorted_antecedents[i] < pronoun_position and [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in all_NPs:
+                                tmp_NP_position = int(sorted_antecedents[i])
+                                if tmp_NP_position < pronoun_position and [top_span_starts[tmp_NP_position],
+                                                                           top_span_ends[tmp_NP_position]] in all_NPs:
                                     # print(i)
                                     coreference_result[pronoun_type]['all_coref'] += 1
-                                    if [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in correct_NPs:
+                                    if [top_span_starts[tmp_NP_position],
+                                        top_span_ends[tmp_NP_position]] in correct_NPs:
                                         coreference_result[pronoun_type]['correct_coref'] += 1
-                                    coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type]['correct_coref']/coreference_result[pronoun_type]['all_coref']
+                                    coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type][
+                                                                                       'correct_coref'] / \
+                                                                                   coreference_result[pronoun_type][
+                                                                                       'all_coref']
                                     break
 
 
