@@ -62,14 +62,14 @@ if __name__ == "__main__":
     print('finish processing data')
 
 
-    # config = util.initialize_from_env()
-    # model = cm.CorefModel(config)
-    #
-    # with tf.Session() as session:
-    #     model.restore(session)
-    #
-    #     # print('we are working on NP-NP')
-    #     model.evaluate_external_data(session, test_data, official_stdout=True)
+    config = util.initialize_from_env()
+    model = cm.CorefModel(config)
+
+    with tf.Session() as session:
+        model.restore(session)
+
+        # print('we are working on NP-NP')
+        model.evaluate_pronoun_coreference(session, test_data, official_stdout=True)
 
 # print(all_count)
 
