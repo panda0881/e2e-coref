@@ -690,10 +690,12 @@ class CorefModel(object):
                         if top_span_starts[i] == pronoun_span[0] and top_span_ends[i] == pronoun_span[1]:
                             pronoun_position = i
                             break
+                    print(pronoun_position)
                     if pronoun_position > 0:
                         sorted_antecedents = top_antecedents[pronoun_position]
                         for i in range(pronoun_position):
                             if [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in all_NPs:
+                                print(i)
                                 coreference_result[pronoun_type]['all_coref'] += 1
                                 if [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in correct_NPs:
                                     coreference_result[pronoun_type]['correct_coref'] += 1
@@ -711,7 +713,7 @@ class CorefModel(object):
             # print('predicated_antecedents:', predicted_antecedents)
             print('tmp_data', example['pronoun_coreference_info'])
             print(coreference_result)
-            # break
+            break
 
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
