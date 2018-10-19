@@ -691,7 +691,7 @@ class CorefModel(object):
                         if top_span_starts[i] == pronoun_span[0] and top_span_ends[i] == pronoun_span[1]:
                             pronoun_position = i
                             break
-                    print(pronoun_position)
+                    # print(pronoun_position)
                     if pronoun_position > 0:
                         # sorted_antecedents = top_antecedents[pronoun_position]
                         antecedenc_to_score = dict()
