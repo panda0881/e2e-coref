@@ -718,6 +718,8 @@ class CorefModel(object):
                                 print('shape:', top_antecedent_scores.shape)
                                 print('predicated_antecedents:', predicted_antecedents)
                                 print('tmp_data', example['pronoun_coreference_info'])
+                                print(pronoun_position)
+                                print(i)
                                 print(sorted_antecedents[i])
                                 if sorted_antecedents[i] < pronoun_position and [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in all_NPs:
                                     # print(i)
