@@ -682,6 +682,7 @@ class CorefModel(object):
             all_NPs = example['pronoun_coreference_info']['all_NP']
             for pronoun_type in interested_pronouns:
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict']:
+                    print(pronoun_example)
                     pronoun_span = pronoun_example['pronoun']
                     correct_NPs = pronoun_example['NPs']
                     pronoun_position = -1
@@ -708,7 +709,7 @@ class CorefModel(object):
             # print('top_antecedent_scores:', top_antecedent_scores)
             # print('shape:', top_antecedent_scores.shape)
             # print('predicated_antecedents:', predicted_antecedents)
-            # print('tmp_data', example['pronoun_coreference_info'])
+            print('tmp_data', example['pronoun_coreference_info'])
             print(coreference_result)
             # break
 
