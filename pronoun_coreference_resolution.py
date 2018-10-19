@@ -51,7 +51,7 @@ if __name__ == "__main__":
                             if c[i][1][0] in all_pronouns_by_type[pronoun_type]:
                                 potential_NPs = list()
                                 for j in range(len(c)):
-                                    if len(c[j][1]) != 0 or c[j][1][0] not in all_pronouns:
+                                    if len(c[j][1]) != 1 or c[j][1][0] not in all_pronouns:
                                         potential_NPs.append(c[j][0])
                                 if len(potential_NPs) > 0:
                                     Pronoun_dict[pronoun_type].append({'pronoun': c[i][0], 'NPs': potential_NPs})
