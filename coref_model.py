@@ -20,7 +20,6 @@ import metrics
 from util import *
 
 
-
 class CorefModel(object):
     def __init__(self, config):
         self.config = config
@@ -336,7 +335,8 @@ class CorefModel(object):
         # candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
         # candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
 
-        candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts, gold_ends)
+        candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts,
+                                                                  gold_ends)
 
         k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
         top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
@@ -696,46 +696,22 @@ class CorefModel(object):
                         # sorted_antecedents = top_antecedents[pronoun_position]
                         antecedence_to_score = dict()
                         for i in range(len(top_antecedents[pronoun_position])):
-                            antecedence_to_score[str(top_antecedents[pronoun_position][i])] = top_antecedent_scores[pronoun_position][i+1]
-                        sorted_antecedents = sorted(antecedence_to_score, key= lambda x: antecedence_to_score[x], reverse=True)
+                            antecedence_to_score[str(top_antecedents[pronoun_position][i])] = \
+                            top_antecedent_scores[pronoun_position][i + 1]
+                        sorted_antecedents = sorted(antecedence_to_score, key=lambda x: antecedence_to_score[x],
+                                                    reverse=True)
                         for i in range(len(sorted_antecedents)):
-                            try:
-                                tmp_NP_position = int(sorted_antecedents[i])
-                                if tmp_NP_position < pronoun_position and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
-                                    # print(i)
-                                    coreference_result[pronoun_type]['all_coref'] += 1
-                                    if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in correct_NPs:
-                                        coreference_result[pronoun_type]['correct_coref'] += 1
-                                    coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type]['correct_coref']/coreference_result[pronoun_type]['all_coref']
-                                    break
-                            except:
-                                print('top_span_starts:', top_span_starts)
-                                print('shape:', top_span_starts.shape)
-                                print('top_span_ends:', top_span_ends)
-                                print('shape:', top_span_ends.shape)
-                                print('top_antecedents', top_antecedents)
-                                print('shape:', top_antecedents.shape)
-                                print('top_antecedent_scores:', top_antecedent_scores)
-                                print('shape:', top_antecedent_scores.shape)
-                                print('predicated_antecedents:', predicted_antecedents)
-                                print('tmp_data', example['pronoun_coreference_info'])
-                                print(pronoun_position)
-                                print(i)
-                                print(sorted_antecedents[i])
-                                tmp_NP_position = int(sorted_antecedents[i])
-                                if tmp_NP_position < pronoun_position and [top_span_starts[tmp_NP_position],
-                                                                           top_span_ends[tmp_NP_position]] in all_NPs:
-                                    # print(i)
-                                    coreference_result[pronoun_type]['all_coref'] += 1
-                                    if [top_span_starts[tmp_NP_position],
-                                        top_span_ends[tmp_NP_position]] in correct_NPs:
-                                        coreference_result[pronoun_type]['correct_coref'] += 1
-                                    coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type][
-                                                                                       'correct_coref'] / \
-                                                                                   coreference_result[pronoun_type][
-                                                                                       'all_coref']
-                                    break
-
+                            tmp_NP_position = int(sorted_antecedents[i])
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
+                                # print(i)
+                                coreference_result[pronoun_type]['all_coref'] += 1
+                                if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in correct_NPs:
+                                    coreference_result[pronoun_type]['correct_coref'] += 1
+                                coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type][
+                                                                                   'correct_coref'] / \
+                                                                               coreference_result[pronoun_type][
+                                                                                   'all_coref']
+                                break
 
             # print('top_span_starts:', top_span_starts)
             # print('shape:', top_span_starts.shape)
@@ -749,7 +725,6 @@ class CorefModel(object):
             # print('tmp_data', example['pronoun_coreference_info'])
             print(coreference_result)
             # break
-
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
         NP_NP_clusters = list()
@@ -860,7 +835,6 @@ class CorefModel(object):
             print('NP-P correct', NP_P_correct, '/', NP_P_gold)
             print('P-P correct', P_P_correct, '/', P_P_gold)
 
-
             all_NP_NP_predict_pair_counter += NP_NP_predict
             all_NP_NP_correct_pair_counter += NP_NP_correct
             all_NP_NP_gold_pair_counter += NP_NP_gold
@@ -887,7 +861,7 @@ class CorefModel(object):
         NP_NP_r = all_NP_NP_correct_pair_counter / all_NP_NP_gold_pair_counter
         NP_NP_f = 2 * NP_NP_p * NP_NP_r / (NP_NP_p + NP_NP_r)
         print('NP-NP:')
-        print("Average F1 (py): {:.2f}%".format(NP_NP_f*100))
+        print("Average F1 (py): {:.2f}%".format(NP_NP_f * 100))
         # summary_dict["Average precision (py)"] = p
         print("Average precision (py): {:.2f}%".format(NP_NP_p * 100))
         # summary_dict["Average recall (py)"] = r
