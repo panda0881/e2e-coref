@@ -702,18 +702,18 @@ class CorefModel(object):
                                 coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type]['correct_coref']/coreference_result[pronoun_type]['all_coref']
                                 break
 
-            # print('top_span_starts:', top_span_starts)
-            # print('shape:', top_span_starts.shape)
-            # print('top_span_ends:', top_span_ends)
-            # print('shape:', top_span_ends.shape)
+            print('top_span_starts:', top_span_starts)
+            print('shape:', top_span_starts.shape)
+            print('top_span_ends:', top_span_ends)
+            print('shape:', top_span_ends.shape)
             print('top_antecedents', top_antecedents)
             print('shape:', top_antecedents.shape)
-            # print('top_antecedent_scores:', top_antecedent_scores)
-            # print('shape:', top_antecedent_scores.shape)
-            # print('predicated_antecedents:', predicted_antecedents)
+            print('top_antecedent_scores:', top_antecedent_scores)
+            print('shape:', top_antecedent_scores.shape)
+            print('predicated_antecedents:', predicted_antecedents)
             print('tmp_data', example['pronoun_coreference_info'])
             print(coreference_result)
-            break
+            # break
 
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
