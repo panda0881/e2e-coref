@@ -677,15 +677,15 @@ class CorefModel(object):
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
             predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
-            # print('predicted clusters:')
-            # print(predicted_clusters)
-            # print('gold clusters')
-            # print((example['NP_NP_clusters'], example['NP_P_clusters'], example['P_P_clusters']))
-            # NP_NP_predict, NP_NP_correct, NP_NP_gold, NP_P_predict, NP_P_correct, NP_P_gold, P_P_predict, P_P_correct, P_P_gold = self.evaluate_pairwise_coref(
-            #     predicted_clusters, (example['NP_NP_clusters'], example['NP_P_clusters'], example['P_P_clusters']))
-            # print('NP-NP correct', NP_NP_correct, '/', NP_NP_gold)
-            # print('NP-P correct', NP_P_correct, '/', NP_P_gold)
-            # print('P-P correct', P_P_correct, '/', P_P_gold)
+            # for pronoun_type in interested_pronouns:
+            #     for pronoun_example in example['pronoun_coreference_info']['pronoun_dict']:
+            #         pronoun_span = pronoun_example['pronoun']
+            #         correct_NPs = pronoun_example['NPs']
+            #         pronoun_position = -1
+            #         for i in range(top_span_starts.shape[0]):
+            #             if top_span_starts[i] == pronoun_span[0] and top_span_ends[i] == pronoun_span[1]:
+            #                 pronoun_position = i
+
             print('top_span_starts:', top_span_starts)
             print('shape:', top_span_starts.shape)
             print('top_span_ends:', top_span_ends)
@@ -694,6 +694,7 @@ class CorefModel(object):
             print('shape:', top_antecedents.shape)
             print('top_antecedent_scores:', top_antecedent_scores)
             print('shape:', top_antecedent_scores.shape)
+            print('predicated_antecedents:', predicted_antecedents)
             print('tmp_data', example['pronoun_coreference_info'])
             break
 
