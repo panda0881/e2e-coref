@@ -693,11 +693,11 @@ class CorefModel(object):
                             break
                     print(pronoun_position)
                     if pronoun_position > 0:
-                        sorted_antecedents = top_antecedents[pronoun_position]
+                        # sorted_antecedents = top_antecedents[pronoun_position]
                         antecedenc_to_score = dict()
                         for i in range(len(top_antecedents[pronoun_position])):
                             antecedenc_to_score[top_antecedents[pronoun_position][i]] = top_antecedent_scores[pronoun_position][i+1]
-                        sorted_antecedents = sorted(antecedenc_to_score, key= lambda x: antecedenc_to_score[x])
+                        sorted_antecedents = sorted(antecedenc_to_score, key= lambda x: antecedenc_to_score[x], reverse=True)
                         for i in range(pronoun_position):
                             if sorted_antecedents[i] < pronoun_position and [top_span_starts[sorted_antecedents[i]], top_span_ends[sorted_antecedents[i]]] in all_NPs:
                                 print(i)
