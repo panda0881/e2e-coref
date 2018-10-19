@@ -17,10 +17,10 @@ from util import *
 # with tf.Session() as session:
 #     model.restore(session)
 #     model.evaluate(session, official_stdout=True)
-all_count = dict()
-all_count['NP'] = 0
-for pronoun_type in all_pronouns_by_type:
-    all_count[pronoun_type] = 0
+# all_count = dict()
+# all_count['NP'] = 0
+# for pronoun_type in all_pronouns_by_type:
+#     all_count[pronoun_type] = 0
 if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     test_data = list()
@@ -40,14 +40,25 @@ if __name__ == "__main__":
                         tmp_w.append(token)
                     tmp_c.append((w, tmp_w))
                 all_clusters.append(tmp_c)
+            tmp_all_NPs = list()
+            Pronoun_dict = dict()
+            for pronoun_type in interested_pronouns:
+                Pronoun_dict[pronoun_type] = list()
             for c in all_clusters:
                 for i in range(len(c)):
                     if len(c[i][1]) == 1 and c[i][1][0] in all_pronouns:
-                        for pronoun_type in all_pronouns_by_type:
+                        for pronoun_type in interested_pronouns:
                             if c[i][1][0] in all_pronouns_by_type[pronoun_type]:
-                                all_count[pronoun_type] += 1
+                                potential_NPs = list()
+                                for j in range(len(c)):
+                                    if len(c[j][1]) != 0 or c[j][1][0] not in all_pronouns:
+                                        potential_NPs.append(c[i][0])
+                                if len(potential_NPs) > 0:
+                                    Pronoun_dict[pronoun_type].append({'pronoun': c[i][0], 'NPs': potential_NPs})
                     else:
-                        all_count['NP'] += 1
+                        tmp_all_NPs.append(c[i][0])
+            tmp_example['pronoun_coreference_info'] = {'all_NP': tmp_all_NPs, 'pronoun_dict': Pronoun_dict}
+            test_data.append(tmp_example)
     print('finish processing data')
 
 
@@ -60,6 +71,6 @@ if __name__ == "__main__":
     #     # print('we are working on NP-NP')
     #     model.evaluate_external_data(session, test_data, official_stdout=True)
 
-print(all_count)
+# print(all_count)
 
 print('end')

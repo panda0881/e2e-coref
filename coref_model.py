@@ -662,6 +662,38 @@ class CorefModel(object):
 
         return util.make_summary(summary_dict), average_f1
 
+    def evaluate_pronoun_coreference(self, session, evaluation_data):
+        def load_data_by_line(example):
+            return self.tensorize_example(example, is_training=False), example
+
+        self.eval_data = [load_data_by_line(e) for e in evaluation_data]
+        num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
+        print("Loaded {} eval examples.".format(len(self.eval_data)))
+
+        for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
+            feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
+            candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(
+                self.predictions, feed_dict=feed_dict)
+            predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
+            predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
+            # print('predicted clusters:')
+            # print(predicted_clusters)
+            # print('gold clusters')
+            # print((example['NP_NP_clusters'], example['NP_P_clusters'], example['P_P_clusters']))
+            # NP_NP_predict, NP_NP_correct, NP_NP_gold, NP_P_predict, NP_P_correct, NP_P_gold, P_P_predict, P_P_correct, P_P_gold = self.evaluate_pairwise_coref(
+            #     predicted_clusters, (example['NP_NP_clusters'], example['NP_P_clusters'], example['P_P_clusters']))
+            # print('NP-NP correct', NP_NP_correct, '/', NP_NP_gold)
+            # print('NP-P correct', NP_P_correct, '/', NP_P_gold)
+            # print('P-P correct', P_P_correct, '/', P_P_gold)
+            print('top_span_starts:', top_span_starts)
+            print('top_span_ends:', top_span_ends)
+            print('top_antecedents', top_antecedents)
+            print('top_antecedent_scores:', top_antecedent_scores)
+            print('tmp_data', example['pronoun_coreference_info'])
+            break
+
+
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
         NP_NP_clusters = list()
         NP_P_clusters = list()
