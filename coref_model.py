@@ -698,7 +698,7 @@ class CorefModel(object):
                         for i in range(len(top_antecedents[pronoun_position])):
                             antecedence_to_score[str(top_antecedents[pronoun_position][i])] = top_antecedent_scores[pronoun_position][i+1]
                         sorted_antecedents = sorted(antecedence_to_score, key= lambda x: antecedence_to_score[x], reverse=True)
-                        for i in range(pronoun_position):
+                        for i in range(len(sorted_antecedents)):
                             try:
                                 tmp_NP_position = int(sorted_antecedents[i])
                                 if tmp_NP_position < pronoun_position and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
