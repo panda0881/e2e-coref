@@ -687,9 +687,13 @@ class CorefModel(object):
             # print('NP-P correct', NP_P_correct, '/', NP_P_gold)
             # print('P-P correct', P_P_correct, '/', P_P_gold)
             print('top_span_starts:', top_span_starts)
+            print('shape:', top_span_starts.shape)
             print('top_span_ends:', top_span_ends)
+            print('shape:', top_span_ends.shape)
             print('top_antecedents', top_antecedents)
+            print('shape:', top_antecedents.shape)
             print('top_antecedent_scores:', top_antecedent_scores)
+            print('shape:', top_antecedent_scores.shape)
             print('tmp_data', example['pronoun_coreference_info'])
             break
 
