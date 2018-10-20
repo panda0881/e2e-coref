@@ -285,8 +285,10 @@ class CustomLSTMCell(tf.contrib.rnn.RNNCell):
         return _initializer
 
 
-third_personal_pronouns = ['she', 'her', 'he', 'him', 'it', 'them', 'they', 'She', 'Her', 'He', 'Him', 'It', 'Them',
+third_personal_pronouns = ['she', 'her', 'he', 'him', 'them', 'they', 'She', 'Her', 'He', 'Him', 'Them',
                            'They']
+
+neutral_pronoun = ['it', 'It']
 
 first_and_second_personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'Me', 'We', 'Us', 'You']
 relative_pronouns = ['that', 'which', 'who', 'whom', 'whose', 'whichever', 'whoever', 'whomever',
@@ -308,6 +310,7 @@ possessive_pronoun = ['my', 'your', 'his', 'her', 'its', 'our', 'your', 'their',
 all_pronouns_by_type = dict()
 all_pronouns_by_type['first_and_second_personal'] = first_and_second_personal_pronouns
 all_pronouns_by_type['third_personal'] = third_personal_pronouns
+all_pronouns_by_type['neutral'] = neutral_pronoun
 all_pronouns_by_type['relative'] = relative_pronouns
 all_pronouns_by_type['demonstrative'] = demonstrative_pronouns
 all_pronouns_by_type['indefinite'] = indefinite_pronouns
@@ -321,5 +324,4 @@ for pronoun_type in all_pronouns_by_type:
 
 all_pronouns = set(all_pronouns)
 
-interested_pronouns = ['first_and_second_personal', 'third_personal', 'relative', 'demonstrative', 'indefinite',
-                       'reflexive', 'interrogative', 'possessive']
+interested_pronouns = ['third_personal', 'neutral', 'demonstrative', 'possessive']
