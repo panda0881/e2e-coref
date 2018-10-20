@@ -25,7 +25,7 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
     test_data = list()
     print('Start to process data...')
-    with open('test.english.jsonlines', 'r') as f:
+    with open('new.test.english.jsonlines', 'r') as f:
         for line in f:
             tmp_example = json.loads(line)
             all_sentence = list()

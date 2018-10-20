@@ -124,6 +124,58 @@ class CorefModel(object):
             starts, ends, labels = [], [], []
         return np.array(starts), np.array(ends), np.array([label_dict[c] for c in labels])
 
+
+    def tensorize_pronoun_example(self, example):
+        clusters = example["clusters"]
+        all_NPs = example['all_NP']
+        tmp_gold_mentions = [tuple(m) for m in util.flatten(clusters)]
+        for tmp_NP in all_NPs:
+            if tuple(tmp_NP) not in tmp_gold_mentions:
+                tmp_gold_mentions.append(tuple(tmp_NP))
+        gold_mentions = sorted(tmp_gold_mentions)
+        gold_mention_map = {m: i for i, m in enumerate(gold_mentions)}
+        cluster_ids = np.zeros(len(gold_mentions))
+        for cluster_id, cluster in enumerate(clusters):
+            for mention in cluster:
+                cluster_ids[gold_mention_map[tuple(mention)]] = cluster_id + 1
+
+        sentences = example["sentences"]
+        num_words = sum(len(s) for s in sentences)
+        speakers = util.flatten(example["speakers"])
+
+        assert num_words == len(speakers)
+
+        max_sentence_length = max(len(s) for s in sentences)
+        max_word_length = max(max(max(len(w) for w in s) for s in sentences), max(self.config["filter_widths"]))
+        text_len = np.array([len(s) for s in sentences])
+        tokens = [[""] * max_sentence_length for _ in sentences]
+        context_word_emb = np.zeros([len(sentences), max_sentence_length, self.context_embeddings.size])
+        head_word_emb = np.zeros([len(sentences), max_sentence_length, self.head_embeddings.size])
+        char_index = np.zeros([len(sentences), max_sentence_length, max_word_length])
+        for i, sentence in enumerate(sentences):
+            for j, word in enumerate(sentence):
+                tokens[i][j] = word
+                context_word_emb[i, j] = self.context_embeddings[word]
+                head_word_emb[i, j] = self.head_embeddings[word]
+                char_index[i, j, :len(word)] = [self.char_dict[c] for c in word]
+        tokens = np.array(tokens)
+
+        speaker_dict = {s: i for i, s in enumerate(set(speakers))}
+        speaker_ids = np.array([speaker_dict[s] for s in speakers])
+
+        doc_key = example["doc_key"]
+        genre = self.genres[doc_key[:2]]
+
+        gold_starts, gold_ends = self.tensorize_mentions(gold_mentions)
+
+        lm_emb = self.load_lm_embeddings(doc_key)
+
+        example_tensors = (
+            tokens, context_word_emb, head_word_emb, lm_emb, char_index, text_len, speaker_ids, genre, is_training,
+            gold_starts, gold_ends, cluster_ids)
+
+        return example_tensors
+
     def tensorize_example(self, example, is_training):
         clusters = example["clusters"]
 
@@ -665,7 +717,7 @@ class CorefModel(object):
 
     def evaluate_pronoun_coreference(self, session, evaluation_data):
         def load_data_by_line(example):
-            return self.tensorize_example(example, is_training=False), example
+            return self.tensorize_pronoun_example(example), example
 
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
