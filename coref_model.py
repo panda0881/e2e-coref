@@ -124,8 +124,7 @@ class CorefModel(object):
             starts, ends, labels = [], [], []
         return np.array(starts), np.array(ends), np.array([label_dict[c] for c in labels])
 
-
-    def tensorize_pronoun_example(self, example):
+    def tensorize_pronoun_example(self, example, is_training):
         clusters = example["clusters"]
         all_NPs = example['all_NP']
         tmp_gold_mentions = [tuple(m) for m in util.flatten(clusters)]
@@ -717,7 +716,7 @@ class CorefModel(object):
 
     def evaluate_pronoun_coreference(self, session, evaluation_data):
         def load_data_by_line(example):
-            return self.tensorize_pronoun_example(example), example
+            return self.tensorize_pronoun_example(example, is_training=False), example
 
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
