@@ -731,7 +731,7 @@ class CorefModel(object):
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
             predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
-            all_NPs = example['pronoun_coreference_info']['all_NP']
+            all_NPs = example['all_NP']
             for pronoun_type in interested_pronouns:
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                     # print(pronoun_example)
