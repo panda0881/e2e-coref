@@ -292,7 +292,7 @@ def verify_correct_NP_match(predicted_NP, gold_NPs, model):
         else:
             return False
     elif model == 'cover':
-        for tmp_gold_NP in gold_NP:
+        for tmp_gold_NP in gold_NPs:
             if tmp_gold_NP[0] <= predicted_NP[0] and tmp_gold_NP[1] >= predicted_NP[1]:
                 return True
             if tmp_gold_NP[0] >= predicted_NP[0] and tmp_gold_NP[1] <= predicted_NP[1]:
