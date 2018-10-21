@@ -758,7 +758,7 @@ class CorefModel(object):
                             tmp_NP_position = int(sorted_antecedents[i])
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
                                 coreference_result[pronoun_type]['all_coref'] += 1
-                                if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in correct_NPs:
+                                if verify_correct_NP_match([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs, 'cover'):
                                     coreference_result[pronoun_type]['correct_coref'] += 1
                                 coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type][
                                                                                    'correct_coref'] / \
