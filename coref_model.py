@@ -770,6 +770,8 @@ class CorefModel(object):
                             break
                     # print(pronoun_position)
                     if pronoun_position > 0:
+                        coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
+                        coreference_result_by_entity_type[most_entity_type]['all_coref'] += 1
                         # sorted_antecedents = top_antecedents[pronoun_position]
                         antecedence_to_score = dict()
                         for i in range(len(top_antecedents[pronoun_position])):
@@ -780,8 +782,6 @@ class CorefModel(object):
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
-                                coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
-                                coreference_result_by_entity_type[most_entity_type]['all_coref'] += 1
                                 if verify_correct_NP_match(
                                         [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
                                         'cover'):

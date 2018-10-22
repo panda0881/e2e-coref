@@ -88,62 +88,62 @@ with open('failed_cases.jsonlines', 'r') as f:
         all_failed_cases.append(tmp_failed_cases)
 
 all_data_for_analyze = list()
-for i in range(len(all_test_examples)):
-    print('We are working on example:', i)
-    if len(all_failed_cases[i]) == 0:
-        continue
-    tmp_example = all_test_examples[i]
-    all_sentence = list()
-    separate_sentence_range = list()
-    for s in tmp_example['sentences']:
-        separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
-        all_sentence += s
-    tmp_failed_cases = all_failed_cases[i]
-    NP_P_pairs = list()
-    for tmp_failed_case in tmp_failed_cases:
-        for NP in tmp_failed_case[1]['NPs']:
-            NP_P_pairs.append((NP, tmp_failed_case[1]['pronoun'], tmp_failed_case[0]))
-    tmp_data_to_analyze = list()
-    for pair in NP_P_pairs:
-        NP_position = pair[0]
-        Pronoun_position = pair[1]
-        NP = all_sentence[NP_position[0]:NP_position[1] + 1]
-        Pronoun = all_sentence[Pronoun_position[0]:Pronoun_position[1] + 1]
-        target_sentence = ''
-        sentence_position = 0
-        for i, sentence_s_e in enumerate(separate_sentence_range):
-            if sentence_s_e[0] < Pronoun_position[0] < sentence_s_e[1]:
-                for w in tmp_example['sentences'][i]:
-                    target_sentence += ' '
-                    target_sentence += w
-                sentence_position = Pronoun_position[0] - sentence_s_e[0]
-                break
-        if len(target_sentence) > 0:
-            target_sentence = target_sentence[1:]
-        # cleaned_sentence = clean_sentence_for_parsing(target_sentence)
-        tmp_output = nlp_list[0].annotate(target_sentence,
-                                          properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
-
-        Before_length = 0
-        stored_dependency_list = list()
-        for s in tmp_output['sentences']:
-            enhanced_dependency_list = s['enhancedPlusPlusDependencies']
-            for relation in enhanced_dependency_list:
-                if relation['dep'] == 'ROOT':
-                    continue
-                governor_position = relation['governor']
-                dependent_position = relation['dependent']
-                if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
-                    stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
-                                                    s['tokens'][governor_position - 1]['pos']), relation['dep'], (
-                                                       dependent_position, s['tokens'][dependent_position - 1]['lemma'],
-                                                       s['tokens'][dependent_position - 1]['pos'])))
-            Before_length += len(s['tokens'])
-        # print(len(stored_dependency_list))
-        tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
-    all_data_for_analyze.append(tmp_data_to_analyze)
-with open('test_data_for_analyzing.json', 'w') as f:
-    json.dump(all_data_for_analyze, f)
+# for i in range(len(all_test_examples)):
+#     print('We are working on example:', i)
+#     if len(all_failed_cases[i]) == 0:
+#         continue
+#     tmp_example = all_test_examples[i]
+#     all_sentence = list()
+#     separate_sentence_range = list()
+#     for s in tmp_example['sentences']:
+#         separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
+#         all_sentence += s
+#     tmp_failed_cases = all_failed_cases[i]
+#     NP_P_pairs = list()
+#     for tmp_failed_case in tmp_failed_cases:
+#         for NP in tmp_failed_case[1]['NPs']:
+#             NP_P_pairs.append((NP, tmp_failed_case[1]['pronoun'], tmp_failed_case[0]))
+#     tmp_data_to_analyze = list()
+#     for pair in NP_P_pairs:
+#         NP_position = pair[0]
+#         Pronoun_position = pair[1]
+#         NP = all_sentence[NP_position[0]:NP_position[1] + 1]
+#         Pronoun = all_sentence[Pronoun_position[0]:Pronoun_position[1] + 1]
+#         target_sentence = ''
+#         sentence_position = 0
+#         for i, sentence_s_e in enumerate(separate_sentence_range):
+#             if sentence_s_e[0] < Pronoun_position[0] < sentence_s_e[1]:
+#                 for w in tmp_example['sentences'][i]:
+#                     target_sentence += ' '
+#                     target_sentence += w
+#                 sentence_position = Pronoun_position[0] - sentence_s_e[0]
+#                 break
+#         if len(target_sentence) > 0:
+#             target_sentence = target_sentence[1:]
+#         # cleaned_sentence = clean_sentence_for_parsing(target_sentence)
+#         tmp_output = nlp_list[0].annotate(target_sentence,
+#                                           properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
+#
+#         Before_length = 0
+#         stored_dependency_list = list()
+#         for s in tmp_output['sentences']:
+#             enhanced_dependency_list = s['enhancedPlusPlusDependencies']
+#             for relation in enhanced_dependency_list:
+#                 if relation['dep'] == 'ROOT':
+#                     continue
+#                 governor_position = relation['governor']
+#                 dependent_position = relation['dependent']
+#                 if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
+#                     stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
+#                                                     s['tokens'][governor_position - 1]['pos']), relation['dep'], (
+#                                                        dependent_position, s['tokens'][dependent_position - 1]['lemma'],
+#                                                        s['tokens'][dependent_position - 1]['pos'])))
+#             Before_length += len(s['tokens'])
+#         # print(len(stored_dependency_list))
+#         tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
+#     all_data_for_analyze.append(tmp_data_to_analyze)
+# with open('test_data_for_analyzing.json', 'w') as f:
+#     json.dump(all_data_for_analyze, f)
 
 stop_words = list()
 with open('nltk_english.txt', 'r') as f:
@@ -256,56 +256,56 @@ workers = Pool(30)
 
 
 
-# raw_results = list()
-# for example_and_id in example_and_ids:
-#     tmp_result = workers.apply_async(find_OMCS_match_for_a_coreference_pair,
-#                                      args=(example_and_id[0], example_and_id[1],))
-#     raw_results.append(tmp_result)
-# workers.close()
-# workers.join()
-# raw_results = [tmp_result.get() for tmp_result in raw_results]
-#
-# all_matched_pairs = 0
-# all_pairs = 0
-#
-# for p in raw_results:
-#     all_matched_pairs += p[0]
-#     all_pairs += p[1]
-#
-# print(all_matched_pairs, all_pairs, all_matched_pairs / all_pairs)
-
-
-raw_dicts = list()
+raw_results = list()
 for example_and_id in example_and_ids:
-    tmp_dict = workers.apply_async(get_match_dict, args=(example_and_id[0], example_and_id[1],))
-    raw_dicts.append(tmp_dict)
+    tmp_result = workers.apply_async(find_OMCS_match_for_a_coreference_pair,
+                                     args=(example_and_id[0], example_and_id[1],))
+    raw_results.append(tmp_result)
 workers.close()
 workers.join()
-raw_dicts = [tmp_dict.get() for tmp_dict in raw_dicts]
+raw_results = [tmp_result.get() for tmp_result in raw_results]
+
+all_matched_pairs = 0
+all_pairs = 0
+
+for p in raw_results:
+    all_matched_pairs += p[0]
+    all_pairs += p[1]
+
+print(all_matched_pairs, all_pairs, all_matched_pairs / all_pairs)
 
 
-print('Start to merge dict')
-final_dict = dict()
-for edge in OMCS_edges:
-    final_dict[edge] = dict()
+# raw_dicts = list()
+# for example_and_id in example_and_ids:
+#     tmp_dict = workers.apply_async(get_match_dict, args=(example_and_id[0], example_and_id[1],))
+#     raw_dicts.append(tmp_dict)
+# workers.close()
+# workers.join()
+# raw_dicts = [tmp_dict.get() for tmp_dict in raw_dicts]
+#
+#
+# print('Start to merge dict')
+# final_dict = dict()
+# for edge in OMCS_edges:
+#     final_dict[edge] = dict()
+#
+# for tmp_dict in tqdm(raw_dicts):
+#     try:
+#         for edge in OMCS_edges:
+#             for dep_edge in tmp_dict[edge]:
+#                 if dep_edge not in final_dict[edge]:
+#                     final_dict[edge][dep_edge] = 0
+#                 final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+#     except:
+#         print(tmp_dict)
+#         for edge in OMCS_edges:
+#             for dep_edge in tmp_dict[edge]:
+#                 if dep_edge not in final_dict[edge]:
+#                     final_dict[edge] = 0
+#                 final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+#
+# with open('OMCS-coverage-dict.json', 'w') as f:
+#     json.dump(final_dict, f)
 
-for tmp_dict in tqdm(raw_dicts):
-    try:
-        for edge in OMCS_edges:
-            for dep_edge in tmp_dict[edge]:
-                if dep_edge not in final_dict[edge]:
-                    final_dict[edge][dep_edge] = 0
-                final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
-    except:
-        print(tmp_dict)
-        for edge in OMCS_edges:
-            for dep_edge in tmp_dict[edge]:
-                if dep_edge not in final_dict[edge]:
-                    final_dict[edge] = 0
-                final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
 
-with open('OMCS-coverage-dict.json', 'w') as f:
-    json.dump(final_dict, f)
-
-
-test_result = find_OMCS_match_for_a_coreference_pair(example_and_ids[0][0], example_and_ids[0][1])
+# test_result = find_OMCS_match_for_a_coreference_pair(example_and_ids[0][0], example_and_ids[0][1])
