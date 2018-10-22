@@ -57,6 +57,7 @@ def detect_sub_structure(input_parsed_result, starting_position=0):
     return final_result
 
 all_result = list()
+total_error = 0
 with open('test.english.jsonlines', 'r') as f:
     counter = 0
     for line in f:
@@ -89,7 +90,7 @@ with open('test.english.jsonlines', 'r') as f:
                     for NP in NPs:
                         try:
                             if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
-                                print('find a pronoun', all_sentence[NP[0]], NP)
+                                # print('find a pronoun', all_sentence[NP[0]], NP)
                                 continue
                             else:
                                 all_NPs.append(NP)
@@ -98,17 +99,18 @@ with open('test.english.jsonlines', 'r') as f:
                             print('previous words', previous_words)
                             print(sub_sentence['tokens'])
                             print(len(all_sentence))
-                            if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
-                                print('find a pronoun', all_sentence[NP[0]], NP)
-                                continue
-                            else:
-                                all_NPs.append(NP)
+                            total_error += 1
+                            # if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
+                            #     print('find a pronoun', all_sentence[NP[0]], NP)
+                            #     continue
+                            # else:
+                            #     all_NPs.append(NP)
             previous_words += len(w_list)
                     # all_NPs += NPs
-        print('collected NPs:', len(all_NPs))
+        # print('collected NPs:', len(all_NPs))
         tmp_example['all_NP'] = all_NPs
         all_result.append(tmp_example)
-
+print('Total error number:', total_error)
 with open('test.english.jsonlines', 'w') as f:
     for example in all_result:
         f.write(json.dumps(example))
