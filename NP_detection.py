@@ -100,6 +100,7 @@ with open('test.english.jsonlines', 'r') as f:
                             else:
                                 all_NPs.append(NP)
                     # all_NPs += NPs
+        print('collected NPs:', len(all_NPs))
         tmp_example['all_NP'] = all_NPs
         all_result.append(tmp_example)
 
