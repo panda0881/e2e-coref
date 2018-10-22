@@ -715,6 +715,7 @@ class CorefModel(object):
         return util.make_summary(summary_dict), average_f1
 
     def evaluate_pronoun_coreference(self, session, evaluation_data):
+        data_for_analysis = list()
         # setting up
         def load_data_by_line(example):
             return self.tensorize_pronoun_example(example, is_training=False), example
@@ -732,6 +733,7 @@ class CorefModel(object):
 
         # start to predict
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
             candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(
@@ -785,6 +787,8 @@ class CorefModel(object):
                                         'cover'):
                                     coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
                                     coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
+                                else:
+                                    tmp_data_for_analysis.append((pronoun_type, pronoun_example))
                                 coreference_result_by_pronoun[pronoun_type]['accuracy'] = \
                                 coreference_result_by_pronoun[pronoun_type]['correct_coref'] / \
                                 coreference_result_by_pronoun[pronoun_type]['all_coref']
@@ -794,6 +798,8 @@ class CorefModel(object):
                                     coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
                                     coreference_result_by_entity_type[most_entity_type]['all_coref']
                                 break
+            print('length of collected example for analysis:', len(tmp_data_for_analysis))
+            data_for_analysis.append(tmp_data_for_analysis)
 
             # print('top_span_starts:', top_span_starts)
             # print('shape:', top_span_starts.shape)
@@ -805,9 +811,11 @@ class CorefModel(object):
             # print('shape:', top_antecedent_scores.shape)
             # print('predicated_antecedents:', predicted_antecedents)
             # print('tmp_data', example['pronoun_coreference_info'])
-            print(coreference_result_by_pronoun)
-            print(coreference_result_by_entity_type)
+
+            # print(coreference_result_by_pronoun)
+            # print(coreference_result_by_entity_type)
             # break
+        return data_for_analysis
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
         NP_NP_clusters = list()
