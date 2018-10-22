@@ -10,7 +10,7 @@ nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nl
 tmp_nlp = nlp_list[0]
 
 all_examples = list()
-with open('new.test.english.jsonlines', 'r') as f:
+with open('test.english.jsonlines', 'r') as f:
     counter = 0
     for line in f:
         counter += 1
@@ -36,7 +36,7 @@ with open('new.test.english.jsonlines', 'r') as f:
         tmp_example['entities'] = detected_entities
         all_examples.append(tmp_example)
 
-with open('parsed_test_example.jsonlines', 'w') as f:
+with open('test.english.jsonlines', 'w') as f:
     for example in all_examples:
         f.write(json.dumps(example))
         f.write('\n')

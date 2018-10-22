@@ -48,10 +48,10 @@ for pronoun_type in all_pronouns_by_type:
 
 all_pronouns = set(all_pronouns)
 
-# no_nlp_server = 15
-# nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nlp_server)]
-#
-# tmp_nlp = nlp_list[0]
+no_nlp_server = 15
+nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nlp_server)]
+
+tmp_nlp = nlp_list[0]
 #
 # with open('test.english.jsonlines', 'r') as f:
 #     for line in f:
@@ -79,10 +79,66 @@ with open('parsed_test_example.jsonlines', 'r') as f:
         tmp_example = json.loads(line)
         all_test_examples.append(tmp_example)
 
+all_failed_cases = list()
 with open('failed_cases.jsonlines', 'r') as f:
     for line in f:
         tmp_failed_cases = json.loads(line)
-        print('lalal')
+        all_failed_cases.append(tmp_failed_cases)
+
+for i in range(len(all_test_examples)):
+    print('We are working on example:', i)
+    if len(all_failed_cases[i]) == 0:
+        continue
+    tmp_example = all_test_examples[i]
+    all_sentence = list()
+    separate_sentence_range = list()
+    for s in tmp_example['sentences']:
+        separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
+        all_sentence += s
+    tmp_failed_cases = all_failed_cases[i]
+    NP_P_pairs = list()
+    for tmp_failed_case in tmp_failed_cases:
+        for NP in tmp_failed_case[1]['NPs']:
+            NP_P_pairs.append((NP, tmp_failed_case[1]['pronoun'], tmp_failed_case[0]))
+    tmp_data_to_analyze = list()
+    for pair in NP_P_pairs:
+        NP_position = pair[0]
+        Pronoun_position = pair[1]
+        NP = all_sentence[NP_position[0]:NP_position[1] + 1]
+        Pronoun = all_sentence[Pronoun_position[0]:Pronoun_position[1] + 1]
+        target_sentence = ''
+        sentence_position = 0
+        for i, sentence_s_e in enumerate(separate_sentence_range):
+            if sentence_s_e[0] < Pronoun_position[0] < sentence_s_e[1]:
+                for w in tmp_example['sentences'][i]:
+                    target_sentence += ' '
+                    target_sentence += w
+                sentence_position = Pronoun_position[0] - sentence_s_e[0]
+                break
+        if len(target_sentence) > 0:
+            target_sentence = target_sentence[1:]
+        # cleaned_sentence = clean_sentence_for_parsing(target_sentence)
+        tmp_output = nlp_list[0].annotate(target_sentence,
+                                          properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
+
+        Before_length = 0
+        stored_dependency_list = list()
+        for s in tmp_output['sentences']:
+            enhanced_dependency_list = s['enhancedPlusPlusDependencies']
+            for relation in enhanced_dependency_list:
+                if relation['dep'] == 'ROOT':
+                    continue
+                governor_position = relation['governor']
+                dependent_position = relation['dependent']
+                if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
+                    stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
+                                                    s['tokens'][governor_position - 1]['pos']), relation['dep'], (
+                                                       dependent_position, s['tokens'][dependent_position - 1]['lemma'],
+                                                       s['tokens'][dependent_position - 1]['pos'])))
+            Before_length += len(s['tokens'])
+        # print(len(stored_dependency_list))
+        tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
+    print('lalala')
 
 print(all_entity_type)
 print('end')

@@ -1,6 +1,7 @@
 import ujson as json
 from pycorenlp import StanfordCoreNLP
 from pyparsing import OneOrMore, nestedExpr
+from util import *
 
 no_nlp_server = 15
 nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nlp_server)]
@@ -62,6 +63,11 @@ with open('test.english.jsonlines', 'r') as f:
         print(counter)
         counter +=1
         tmp_example = json.loads(line)
+        all_sentence = list()
+        separate_sentence_range = list()
+        for s in tmp_example['sentences']:
+            separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
+            all_sentence += s
         sentence_for_parsing = list()
         all_NPs = []
         previous_words = 0
@@ -78,11 +84,17 @@ with open('test.english.jsonlines', 'r') as f:
                     parsed_result = sub_sentence['parse']
                     NPs = detect_sub_structure(' '.join(parsed_result.replace('\n', '').split()), previous_words)
                     previous_words += len(sub_sentence['tokens'])
-                    all_NPs += NPs
+                    for NP in NPs:
+                        if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
+                            print('find a pronoun')
+                            continue
+                        else:
+                            all_NPs.append(NP)
+                    # all_NPs += NPs
         tmp_example['all_NP'] = all_NPs
         all_result.append(tmp_example)
 
-with open('new.test.english.jsonlines', 'w') as f:
+with open('test.english.jsonlines', 'w') as f:
     for example in all_result:
         f.write(json.dumps(example))
         f.write('\n')
