@@ -85,11 +85,20 @@ with open('test.english.jsonlines', 'r') as f:
                     NPs = detect_sub_structure(' '.join(parsed_result.replace('\n', '').split()), previous_words)
                     previous_words += len(sub_sentence['tokens'])
                     for NP in NPs:
-                        if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
-                            print('find a pronoun', all_sentence[NP[0]], NP)
-                            continue
-                        else:
-                            all_NPs.append(NP)
+                        try:
+                            if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
+                                print('find a pronoun', all_sentence[NP[0]], NP)
+                                continue
+                            else:
+                                all_NPs.append(NP)
+                        except:
+                            print(NP)
+                            print(len(all_sentence))
+                            if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
+                                print('find a pronoun', all_sentence[NP[0]], NP)
+                                continue
+                            else:
+                                all_NPs.append(NP)
                     # all_NPs += NPs
         tmp_example['all_NP'] = all_NPs
         all_result.append(tmp_example)
