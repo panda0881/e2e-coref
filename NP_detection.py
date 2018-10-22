@@ -67,7 +67,7 @@ with open('test.english.jsonlines', 'r') as f:
         separate_sentence_range = list()
         for s in tmp_example['sentences']:
             separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
-            all_sentence += s
+            all_sentence.append(s)
         sentence_for_parsing = list()
         all_NPs = []
         previous_words = 0
