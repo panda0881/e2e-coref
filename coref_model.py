@@ -754,7 +754,7 @@ class CorefModel(object):
                             if NP_span[0] == detected_entity[0][0] and NP_span[1] == detected_entity[0][1]:
                                 if detected_entity[0][1] not in tmp_entity_type_match_dict:
                                     tmp_entity_type_match_dict[detected_entity[1]] = 0
-                                tmp_entity_type_match_dict[detected_entity[0]] += 1
+                                tmp_entity_type_match_dict[detected_entity[1]] += 1
                     if len(tmp_entity_type_match_dict) == 0:
                         most_entity_type = 'Others'
                     else:
@@ -784,11 +784,12 @@ class CorefModel(object):
                                         [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
                                         'cover'):
                                     coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
+                                    coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
                                 coreference_result_by_pronoun[pronoun_type]['accuracy'] = \
                                 coreference_result_by_pronoun[pronoun_type]['correct_coref'] / \
                                 coreference_result_by_pronoun[pronoun_type]['all_coref']
 
-                                coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
+
                                 coreference_result_by_entity_type[most_entity_type]['accuracy'] = \
                                     coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
                                     coreference_result_by_entity_type[most_entity_type]['all_coref']
