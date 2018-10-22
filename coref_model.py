@@ -812,8 +812,8 @@ class CorefModel(object):
             # print('predicated_antecedents:', predicted_antecedents)
             # print('tmp_data', example['pronoun_coreference_info'])
 
-            # print(coreference_result_by_pronoun)
-            # print(coreference_result_by_entity_type)
+            print(coreference_result_by_pronoun)
+            print(coreference_result_by_entity_type)
             # break
         return data_for_analysis
 
