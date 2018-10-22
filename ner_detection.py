@@ -10,7 +10,7 @@ nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nl
 tmp_nlp = nlp_list[0]
 
 all_examples = list()
-with open('test.english.jsonlines', 'r') as f:
+with open('new.test.english.jsonlines', 'r') as f:
     counter = 0
     for line in f:
         counter += 1
