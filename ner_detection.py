@@ -30,7 +30,7 @@ with open('test.english.jsonlines', 'r') as f:
                                               properties={'annotators': 'tokenize,pos,lemma,ner', 'outputFormat': 'json'})
                 for s in tmp_output['sentences']:
                     for e in s['entitymentions']:
-                        detected_entities.append(((e['docTokenBegin']+previous_words, e['docTokenEnd']+previous_words), e['ner']))
+                        detected_entities.append(((e['docTokenBegin']+previous_words, e['docTokenEnd']+previous_words-1), e['ner']))
                     previous_words += len(s['tokens'])
                 # tmp_example['parsed_result'].append(tmp_output)
         tmp_example['entities'] = detected_entities

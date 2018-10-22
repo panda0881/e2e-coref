@@ -721,9 +721,9 @@ class CorefModel(object):
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
         print("Loaded {} eval examples.".format(len(self.eval_data)))
-        coreference_result = dict()
+        coreference_result_by_pronoun = dict()
         for pronoun_type in interested_pronouns:
-            coreference_result[pronoun_type] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
+            coreference_result_by_pronoun[pronoun_type] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
@@ -751,19 +751,20 @@ class CorefModel(object):
                         antecedence_to_score = dict()
                         for i in range(len(top_antecedents[pronoun_position])):
                             antecedence_to_score[str(top_antecedents[pronoun_position][i])] = \
-                            top_antecedent_scores[pronoun_position][i + 1]
+                                top_antecedent_scores[pronoun_position][i + 1]
                         sorted_antecedents = sorted(antecedence_to_score, key=lambda x: antecedence_to_score[x],
                                                     reverse=True)
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
-                                coreference_result[pronoun_type]['all_coref'] += 1
-                                if verify_correct_NP_match([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs, 'cover'):
-                                    coreference_result[pronoun_type]['correct_coref'] += 1
-                                coreference_result[pronoun_type]['accuracy'] = coreference_result[pronoun_type][
-                                                                                   'correct_coref'] / \
-                                                                               coreference_result[pronoun_type][
-                                                                                   'all_coref']
+                                coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
+                                if verify_correct_NP_match(
+                                        [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
+                                        'cover'):
+                                    coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
+                                coreference_result_by_pronoun[pronoun_type]['accuracy'] = \
+                                coreference_result_by_pronoun[pronoun_type]['correct_coref'] / \
+                                coreference_result_by_pronoun[pronoun_type]['all_coref']
                                 break
 
             # print('top_span_starts:', top_span_starts)
