@@ -73,7 +73,7 @@ if __name__ == "__main__":
         with open('failed_cases.jsonlines', 'w') as f:
             for e in data_for_analysis:
                 f.write(json.dumps(e))
-                f.write('/n')
+                f.write('\n')
 
 # print(all_count)
 
