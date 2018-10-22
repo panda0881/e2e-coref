@@ -80,7 +80,7 @@ with open('test.english.jsonlines', 'r') as f:
                 tmp_s = tmp_s[1:]
                 tmp_output = tmp_nlp.annotate(tmp_s,
                                               properties={'annotators': 'tokenize, parse', 'outputFormat': 'json'})
-                print(len(tmp_output['sentences']))
+                # print(len(tmp_output['sentences']))
                 for sub_sentence in tmp_output['sentences']:
                     parsed_result = sub_sentence['parse']
                     tmp_previous_words = previous_words
