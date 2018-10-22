@@ -81,9 +81,9 @@ with open('test.english.jsonlines', 'r') as f:
                 tmp_output = tmp_nlp.annotate(tmp_s,
                                               properties={'annotators': 'tokenize, parse', 'outputFormat': 'json'})
                 # print(len(tmp_output['sentences']))
+                tmp_previous_words = previous_words
                 for sub_sentence in tmp_output['sentences']:
                     parsed_result = sub_sentence['parse']
-                    tmp_previous_words = previous_words
                     NPs = detect_sub_structure(' '.join(parsed_result.replace('\n', '').split()), tmp_previous_words)
                     tmp_previous_words += len(sub_sentence['tokens'])
                     for NP in NPs:
