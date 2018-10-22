@@ -83,7 +83,7 @@ with open('test.english.jsonlines', 'r') as f:
                 for sub_sentence in tmp_output['sentences']:
                     parsed_result = sub_sentence['parse']
                     NPs = detect_sub_structure(' '.join(parsed_result.replace('\n', '').split()), previous_words)
-                    previous_words += len(sub_sentence['tokens'])
+                    previous_words += len(w_list)
                     for NP in NPs:
                         try:
                             if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
