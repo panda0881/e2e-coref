@@ -9,7 +9,7 @@ nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nl
 tmp_nlp = nlp_list[0]
 
 
-def detect_sub_structure(input_parsed_result, starting_posiiton=0):
+def detect_sub_structure(input_parsed_result, starting_position=0):
     all_sub_structures = list()
     tmp_data = input_parsed_result[1:-1]
     tag = tmp_data.split(' ')[0]
@@ -23,7 +23,7 @@ def detect_sub_structure(input_parsed_result, starting_posiiton=0):
             if c == ')':
                 if last_triger == '(':
                     word_counter += 1
-        current_NP.append([starting_posiiton, starting_posiiton + word_counter - 1])
+        current_NP.append([starting_position, starting_position + word_counter - 1])
 
     front_counter = 0
     end_counter = 0
@@ -45,7 +45,7 @@ def detect_sub_structure(input_parsed_result, starting_posiiton=0):
         if front_counter == end_counter and end_counter > 0:
             front_counter = 0
             end_counter = 0
-            all_sub_structures.append((current_sub_substructure + ')', starting_posiiton + previous_word_counter))
+            all_sub_structures.append((current_sub_substructure + ')', starting_position + previous_word_counter))
             previous_word_counter += word_counter
             word_counter = 0
 
@@ -80,10 +80,12 @@ with open('test.english.jsonlines', 'r') as f:
                 tmp_s = tmp_s[1:]
                 tmp_output = tmp_nlp.annotate(tmp_s,
                                               properties={'annotators': 'tokenize, parse', 'outputFormat': 'json'})
+                print(len(tmp_output['sentences']))
                 for sub_sentence in tmp_output['sentences']:
                     parsed_result = sub_sentence['parse']
-                    NPs = detect_sub_structure(' '.join(parsed_result.replace('\n', '').split()), previous_words)
-                    previous_words += len(w_list)
+                    tmp_previous_words = previous_words
+                    NPs = detect_sub_structure(' '.join(parsed_result.replace('\n', '').split()), tmp_previous_words)
+                    tmp_previous_words += len(sub_sentence['tokens'])
                     for NP in NPs:
                         try:
                             if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
@@ -101,6 +103,7 @@ with open('test.english.jsonlines', 'r') as f:
                                 continue
                             else:
                                 all_NPs.append(NP)
+            previous_words += len(w_list)
                     # all_NPs += NPs
         print('collected NPs:', len(all_NPs))
         tmp_example['all_NP'] = all_NPs
