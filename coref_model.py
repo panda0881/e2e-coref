@@ -823,7 +823,7 @@ class CorefModel(object):
         print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number / all_pronoun_numebr)
         return data_for_analysis
 
-    def evaluate_pronoun_coreference_with_filter(self, session, evaluation_data, filter_span=2):
+    def evaluate_pronoun_coreference_with_filter(self, session, evaluation_data, filter_span=2, rank=False):
         data_for_analysis = list()
         # setting up
         def load_data_by_line(example):
@@ -892,15 +892,14 @@ class CorefModel(object):
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
-                                top_NPs.append(tmp_NP_position)
+                                top_NPs.append([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                                 if len(top_NPs) >= filter_span:
                                     break
                         found_match = False
-                        for tmp_NP_position in top_NPs:
-
-                            if verify_correct_NP_match(
-                                        [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
-                                        'cover'):
+                        if rank:
+                            top_NPs = post_ranking(example, [top_span_starts[pronoun_position], top_span_ends[pronoun_position]], top_NPs)
+                        for tmp_NP in top_NPs:
+                            if verify_correct_NP_match(tmp_NP, correct_NPs, 'cover'):
                                 found_match = True
                                 break
                         if found_match:

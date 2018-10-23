@@ -78,7 +78,7 @@ if __name__ == "__main__":
         model.restore(session)
 
         # print('we are working on NP-NP')
-        # data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, 10)
+        data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=10, rank=False)
 
         data_for_analysis = model.evaluate_pronoun_coreference(session, test_data)
         with open('failed_cases.jsonlines', 'w') as f:

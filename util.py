@@ -14,6 +14,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 import pyhocon
+from pycorenlp import StanfordCoreNLP
 
 
 def initialize_from_env():
@@ -300,6 +301,68 @@ def verify_correct_NP_match(predicted_NP, gold_NPs, model):
     return False
 
 
+def get_pronoun_related_words(example, pronoun_position):
+    related_words = list()
+    separate_sentence_range = list()
+    all_sentence = list()
+    for s in example['sentences']:
+        separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s) - 1))
+        all_sentence += s
+    target_sentence = ''
+    sentence_position = 0
+    for j, sentence_s_e in enumerate(separate_sentence_range):
+        if sentence_s_e[0] <= pronoun_position[0] <= sentence_s_e[1]:
+            for w in example['sentences'][j]:
+                target_sentence += ' '
+                target_sentence += w
+            sentence_position = pronoun_position[0] - sentence_s_e[0]
+            break
+    if len(target_sentence) > 0:
+        target_sentence = target_sentence[1:]
+    tmp_output = nlp_list[0].annotate(target_sentence,
+                                      properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
+    for s in tmp_output['sentences']:
+        enhanced_dependency_list = s['enhancedPlusPlusDependencies']
+        for relation in enhanced_dependency_list:
+            if relation['dep'] == 'ROOT':
+                continue
+            governor_position = relation['governor']
+            dependent_position = relation['dependent']
+            if relation[
+                'governorGloss'] in all_pronouns and sentence_position <= governor_position <= sentence_position + 2:
+                if 'dobj' in relation[1] or 'nsubj' in relation[1] or 'nmod' in relation[1]:
+                    related_words.append(relation['dependentGloss'])
+
+            if relation[
+                'dependentGloss'] in all_pronouns and sentence_position <= dependent_position <= sentence_position + 2:
+                if 'dobj' in relation[1] or 'nsubj' in relation[1] or 'nmod' in relation[1]:
+                    related_words.append(relation['governorGloss'])
+
+        # Before_length += len(s['tokens'])
+    return related_words
+
+
+def post_ranking(example, pronoun_position, top_NPs):
+    pronoun_related_words = get_pronoun_related_words(example, pronoun_position)
+    return top_NPs[0]
+
+
+stop_words = list()
+with open('nltk_english.txt', 'r') as f:
+    for line in f:
+        stop_words.append(line[:-1])
+stop_words = set(stop_words)
+
+# with open('test_data_for_analyzing.json', 'r') as f:
+#     all_test_data = json.load(f)
+
+OMCS_data = list()
+with open('OMCS/new_omcs600.txt', 'r', encoding='utf-8') as f:
+    for line in f:
+        words = line.split('\t')
+        OMCS_data.append((words[0], words[1].split(' '), words[2].split(' ')))
+
+
 third_personal_pronouns = ['she', 'her', 'he', 'him', 'them', 'they', 'She', 'Her', 'He', 'Him', 'Them',
                            'They']
 
@@ -344,3 +407,8 @@ interested_pronouns = ['third_personal', 'neutral', 'demonstrative', 'possessive
 interested_entity_types = ['NATIONALITY', 'ORGANIZATION', 'PERSON', 'DATE', 'CAUSE_OF_DEATH', 'CITY', 'LOCATION',
                            'NUMBER', 'TITLE', 'TIME', 'ORDINAL', 'DURATION', 'MISC', 'COUNTRY', 'SET', 'PERCENT',
                            'STATE_OR_PROVINCE', 'MONEY', 'CRIMINAL_CHARGE', 'IDEOLOGY', 'RELIGION', 'URL', 'EMAIL']
+
+no_nlp_server = 15
+nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nlp_server)]
+
+tmp_nlp = nlp_list[0]
