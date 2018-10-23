@@ -381,7 +381,7 @@ def post_ranking(example, pronoun_position, top_NPs):
         all_sentence += s
     for NP_position in top_NPs:
         # top_NP_words.append(all_sentence[NP_position])
-        current_NP = all_sentence[NP_position[0]:NP_position[1]]
+        current_NP = all_sentence[NP_position[0]:NP_position[1]+1]
         print(current_NP)
         tmp_score = 0
         for related_word in pronoun_related_words:
