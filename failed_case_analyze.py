@@ -226,10 +226,11 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
                     tmp_other_word = edge[0][1]
                 found_match = False
                 for pair in OMCS_data:
-                    if tmp_other_word not in stop_words and verify_match((filter_stop_words(NP, stop_words), [tmp_other_word]), pair[1:]) and edge[1] not in ['case', 'det:qmod']:
-                        found_match = True
-                        pronoun_found_match = True
-                        break
+                    if tmp_other_word not in stop_words and verify_match((filter_stop_words(NP, stop_words), [tmp_other_word]), pair[1:]):
+                        if 'dobj' in edge[1] or 'nsubj' in edge[1] or 'nmod' in edge[1]:
+                            found_match = True
+                            pronoun_found_match = True
+                            break
                 if found_match:
                     # found_match_pair += 1
                     break
