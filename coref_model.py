@@ -813,8 +813,14 @@ class CorefModel(object):
             # print('tmp_data', example['pronoun_coreference_info'])
 
             print(coreference_result_by_pronoun)
-            print(coreference_result_by_entity_type)
+            # print(coreference_result_by_entity_type)
             # break
+        all_pronoun_correct_number = 0
+        all_pronoun_numebr = 0
+        for pronoun_type in coreference_result_by_pronoun:
+            all_pronoun_correct_number += coreference_result_by_pronoun[pronoun_type]['correct_coref']
+            all_pronoun_numebr += coreference_result_by_pronoun[pronoun_type]['all_coref']
+        print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number / all_pronoun_numebr)
         return data_for_analysis
 
     def evaluate_pronoun_coreference_with_filter(self, session, evaluation_data, filter_span=2):
@@ -925,8 +931,14 @@ class CorefModel(object):
             # print('tmp_data', example['pronoun_coreference_info'])
 
             print(coreference_result_by_pronoun)
-            print(coreference_result_by_entity_type)
+            # print(coreference_result_by_entity_type)
             # break
+        all_pronoun_correct_number = 0
+        all_pronoun_numebr = 0
+        for pronoun_type in coreference_result_by_pronoun:
+            all_pronoun_correct_number += coreference_result_by_pronoun[pronoun_type]['correct_coref']
+            all_pronoun_numebr += coreference_result_by_pronoun[pronoun_type]['all_coref']
+        print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number/all_pronoun_numebr)
         return data_for_analysis
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
