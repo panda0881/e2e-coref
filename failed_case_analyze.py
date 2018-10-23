@@ -257,7 +257,7 @@ def get_match_dict(tmp_data, example_id):
                 else:
                     tmp_other_word = edge[0][1]
                 for pair in OMCS_data:
-                    if verify_match((NP, tmp_other_word), pair[1:]) and pair[0] in OMCS_edges:
+                    if verify_match((NP, tmp_other_word), pair[1:]) and pair[0] in OMCS_edges and edge[1] != 'case':
                         if edge[1] not in local_dict[pair[0]]:
                             local_dict[pair[0]][edge[1]] = 0
                         local_dict[pair[0]][edge[1]] += 1
