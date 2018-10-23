@@ -296,7 +296,7 @@ selected_examples = list()
 for p in raw_results:
     all_matched_pairs += p[0]
     all_pairs += p[1]
-    if p[0]/p[1] >= 0.2:
+    if p[1] > 0 and p[0]/p[1] >= 0.2:
         selected_examples.append(p[2])
 
 with open('selected_example.json', 'w') as f:
