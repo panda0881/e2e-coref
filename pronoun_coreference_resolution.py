@@ -32,9 +32,9 @@ if __name__ == "__main__":
     with open('test.english.jsonlines', 'r') as f:
         counter = 0
         for line in f:
-            if counter not in selected_example:
-                counter += 1
-                continue
+            # if counter not in selected_example:
+            #     counter += 1
+            #     continue
             counter += 1
             tmp_example = json.loads(line)
             all_sentence = list()
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         model.restore(session)
 
         # print('we are working on NP-NP')
-        data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=2, rank=True)
+        # data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=2, rank=True)
 
         data_for_analysis = model.evaluate_pronoun_coreference(session, test_data)
         with open('failed_cases.jsonlines', 'w') as f:
