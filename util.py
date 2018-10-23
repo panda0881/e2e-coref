@@ -321,7 +321,7 @@ def get_coverage(w_list1, w_list2):
     return tmp_count / len(w_list1)
 
 
-def verify_match(coreference_pair, OMCS_pair, limitation=0.5):
+def verify_match(coreference_pair, OMCS_pair, limitation=0.4):
     if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1],
                                                                                       OMCS_pair[1]) >= limitation:
         return True
@@ -389,8 +389,8 @@ def post_ranking(example, pronoun_position, top_NPs):
                     tmp_score += 1
         NP_match_scores.append(tmp_score)
     print(NP_match_scores)
-    # return [top_NPs[NP_match_scores.index(max(NP_match_scores))]]
-    return top_NPs
+    return [top_NPs[NP_match_scores.index(max(NP_match_scores))]]
+    # return top_NPs
 
 
 
