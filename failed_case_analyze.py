@@ -97,7 +97,7 @@ for i in range(len(all_test_examples)):
     all_sentence = list()
     separate_sentence_range = list()
     for s in tmp_example['sentences']:
-        separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
+        separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)-1))
         all_sentence += s
     tmp_failed_cases = all_failed_cases[i]
     case_to_analyze_by_example = list()
@@ -114,7 +114,7 @@ for i in range(len(all_test_examples)):
             target_sentence = ''
             sentence_position = 0
             for i, sentence_s_e in enumerate(separate_sentence_range):
-                if sentence_s_e[0] < Pronoun_position[0] < sentence_s_e[1]:
+                if sentence_s_e[0] <= Pronoun_position[0] <= sentence_s_e[1]:
                     for w in tmp_example['sentences'][i]:
                         target_sentence += ' '
                         target_sentence += w
@@ -135,11 +135,25 @@ for i in range(len(all_test_examples)):
                         continue
                     governor_position = relation['governor']
                     dependent_position = relation['dependent']
-                    if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
+                    if relation['governorGloss'] in all_pronouns and sentence_position <= governor_position <= sentence_position + 2:
                         stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
                                                         s['tokens'][governor_position - 1]['pos']), relation['dep'], (
-                                                           dependent_position, s['tokens'][dependent_position - 1]['lemma'],
+                                                           dependent_position,
+                                                           s['tokens'][dependent_position - 1]['lemma'],
                                                            s['tokens'][dependent_position - 1]['pos'])))
+                        if relation['dep'] == 'case':
+                            print(relation)
+                            print('lalala')
+                    if relation['dependentGloss'] in all_pronouns and sentence_position <= dependent_position <= sentence_position + 2:
+                        stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
+                                                        s['tokens'][governor_position - 1]['pos']), relation['dep'], (
+                                                           dependent_position,
+                                                           s['tokens'][dependent_position - 1]['lemma'],
+                                                           s['tokens'][dependent_position - 1]['pos'])))
+                        if relation['dep'] == 'case':
+                            print(relation)
+                            print('lalala')
+
                 Before_length += len(s['tokens'])
             # print(len(stored_dependency_list))
             tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
