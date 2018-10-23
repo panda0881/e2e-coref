@@ -261,7 +261,7 @@ def get_match_dict(tmp_data, example_id):
                         if edge[1] not in local_dict[pair[0]]:
                             local_dict[pair[0]][edge[1]] = 0
                         local_dict[pair[0]][edge[1]] += 1
-        print('File', example_id, 'finished')
+    print('File', example_id, 'finished')
     return local_dict
 
 
