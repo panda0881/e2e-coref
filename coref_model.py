@@ -740,10 +740,23 @@ class CorefModel(object):
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
             predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
-            all_NPs = example['all_NP']
+            all_NPs = list()
             for conll_NP in example['pronoun_coreference_info']['all_NP']:
                 if conll_NP not in all_NPs:
                     all_NPs.append(conll_NP)
+            parsed_NPs = list()
+            for tmp_NP in example['all_NP']:
+                found_overlap_NP = False
+                for NP in parsed_NPs:
+                    if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
+                        found_overlap_NP = True
+                        break
+                    if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
+                        found_overlap_NP = True
+                        break
+                if not found_overlap_NP:
+                    parsed_NPs.append(tmp_NP)
+            all_NPs += parsed_NPs
             for pronoun_type in interested_pronouns:
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                     # print(pronoun_example)
@@ -784,7 +797,7 @@ class CorefModel(object):
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
                                 if verify_correct_NP_match(
                                         [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
-                                        'cover'):
+                                        'exact'):
                                     coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
                                     coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
                                 else:
