@@ -280,56 +280,56 @@ workers = Pool(30)
 
 
 
-raw_results = list()
-for example_and_id in example_and_ids:
-    tmp_result = workers.apply_async(find_OMCS_match_for_a_coreference_pair,
-                                     args=(example_and_id[0], example_and_id[1],))
-    raw_results.append(tmp_result)
-workers.close()
-workers.join()
-raw_results = [tmp_result.get() for tmp_result in raw_results]
-
-all_matched_pairs = 0
-all_pairs = 0
-
-for p in raw_results:
-    all_matched_pairs += p[0]
-    all_pairs += p[1]
-
-print(all_matched_pairs, all_pairs, all_matched_pairs / all_pairs)
-
-
-# raw_dicts = list()
+# raw_results = list()
 # for example_and_id in example_and_ids:
-#     tmp_dict = workers.apply_async(get_match_dict, args=(example_and_id[0], example_and_id[1],))
-#     raw_dicts.append(tmp_dict)
+#     tmp_result = workers.apply_async(find_OMCS_match_for_a_coreference_pair,
+#                                      args=(example_and_id[0], example_and_id[1],))
+#     raw_results.append(tmp_result)
 # workers.close()
 # workers.join()
-# raw_dicts = [tmp_dict.get() for tmp_dict in raw_dicts]
+# raw_results = [tmp_result.get() for tmp_result in raw_results]
 #
+# all_matched_pairs = 0
+# all_pairs = 0
 #
-# print('Start to merge dict')
-# final_dict = dict()
-# for edge in OMCS_edges:
-#     final_dict[edge] = dict()
+# for p in raw_results:
+#     all_matched_pairs += p[0]
+#     all_pairs += p[1]
 #
-# for tmp_dict in tqdm(raw_dicts):
-#     try:
-#         for edge in OMCS_edges:
-#             for dep_edge in tmp_dict[edge]:
-#                 if dep_edge not in final_dict[edge]:
-#                     final_dict[edge][dep_edge] = 0
-#                 final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
-#     except:
-#         print(tmp_dict)
-#         for edge in OMCS_edges:
-#             for dep_edge in tmp_dict[edge]:
-#                 if dep_edge not in final_dict[edge]:
-#                     final_dict[edge] = 0
-#                 final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
-#
-# with open('OMCS-coverage-dict.json', 'w') as f:
-#     json.dump(final_dict, f)
+# print(all_matched_pairs, all_pairs, all_matched_pairs / all_pairs)
+
+
+raw_dicts = list()
+for example_and_id in example_and_ids:
+    tmp_dict = workers.apply_async(get_match_dict, args=(example_and_id[0], example_and_id[1],))
+    raw_dicts.append(tmp_dict)
+workers.close()
+workers.join()
+raw_dicts = [tmp_dict.get() for tmp_dict in raw_dicts]
+
+
+print('Start to merge dict')
+final_dict = dict()
+for edge in OMCS_edges:
+    final_dict[edge] = dict()
+
+for tmp_dict in tqdm(raw_dicts):
+    try:
+        for edge in OMCS_edges:
+            for dep_edge in tmp_dict[edge]:
+                if dep_edge not in final_dict[edge]:
+                    final_dict[edge][dep_edge] = 0
+                final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+    except:
+        print(tmp_dict)
+        for edge in OMCS_edges:
+            for dep_edge in tmp_dict[edge]:
+                if dep_edge not in final_dict[edge]:
+                    final_dict[edge] = 0
+                final_dict[edge][dep_edge] += tmp_dict[edge][dep_edge]
+
+with open('OMCS-coverage-dict.json', 'w') as f:
+    json.dump(final_dict, f)
 
 
 # test_result = find_OMCS_match_for_a_coreference_pair(example_and_ids[0][0], example_and_ids[0][1])
