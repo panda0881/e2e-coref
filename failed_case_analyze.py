@@ -100,49 +100,51 @@ for i in range(len(all_test_examples)):
         separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s)))
         all_sentence += s
     tmp_failed_cases = all_failed_cases[i]
-    NP_P_pairs = list()
+    case_to_analyze_by_example = list()
     for tmp_failed_case in tmp_failed_cases:
+        tmp_data_to_analyze = list()
+        NP_P_pairs = list()
         for NP in tmp_failed_case[1]['NPs']:
             NP_P_pairs.append((NP, tmp_failed_case[1]['pronoun'], tmp_failed_case[0]))
-    tmp_data_to_analyze = list()
-    for pair in NP_P_pairs:
-        NP_position = pair[0]
-        Pronoun_position = pair[1]
-        NP = all_sentence[NP_position[0]:NP_position[1] + 1]
-        Pronoun = all_sentence[Pronoun_position[0]:Pronoun_position[1] + 1]
-        target_sentence = ''
-        sentence_position = 0
-        for i, sentence_s_e in enumerate(separate_sentence_range):
-            if sentence_s_e[0] < Pronoun_position[0] < sentence_s_e[1]:
-                for w in tmp_example['sentences'][i]:
-                    target_sentence += ' '
-                    target_sentence += w
-                sentence_position = Pronoun_position[0] - sentence_s_e[0]
-                break
-        if len(target_sentence) > 0:
-            target_sentence = target_sentence[1:]
-        # cleaned_sentence = clean_sentence_for_parsing(target_sentence)
-        tmp_output = nlp_list[0].annotate(target_sentence,
-                                          properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
+        for pair in NP_P_pairs:
+            NP_position = pair[0]
+            Pronoun_position = pair[1]
+            NP = all_sentence[NP_position[0]:NP_position[1] + 1]
+            Pronoun = all_sentence[Pronoun_position[0]:Pronoun_position[1] + 1]
+            target_sentence = ''
+            sentence_position = 0
+            for i, sentence_s_e in enumerate(separate_sentence_range):
+                if sentence_s_e[0] < Pronoun_position[0] < sentence_s_e[1]:
+                    for w in tmp_example['sentences'][i]:
+                        target_sentence += ' '
+                        target_sentence += w
+                    sentence_position = Pronoun_position[0] - sentence_s_e[0]
+                    break
+            if len(target_sentence) > 0:
+                target_sentence = target_sentence[1:]
+            # cleaned_sentence = clean_sentence_for_parsing(target_sentence)
+            tmp_output = nlp_list[0].annotate(target_sentence,
+                                              properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
 
-        Before_length = 0
-        stored_dependency_list = list()
-        for s in tmp_output['sentences']:
-            enhanced_dependency_list = s['enhancedPlusPlusDependencies']
-            for relation in enhanced_dependency_list:
-                if relation['dep'] == 'ROOT':
-                    continue
-                governor_position = relation['governor']
-                dependent_position = relation['dependent']
-                if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
-                    stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
-                                                    s['tokens'][governor_position - 1]['pos']), relation['dep'], (
-                                                       dependent_position, s['tokens'][dependent_position - 1]['lemma'],
-                                                       s['tokens'][dependent_position - 1]['pos'])))
-            Before_length += len(s['tokens'])
-        # print(len(stored_dependency_list))
-        tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
-    all_data_for_analyze.append(tmp_data_to_analyze)
+            Before_length = 0
+            stored_dependency_list = list()
+            for s in tmp_output['sentences']:
+                enhanced_dependency_list = s['enhancedPlusPlusDependencies']
+                for relation in enhanced_dependency_list:
+                    if relation['dep'] == 'ROOT':
+                        continue
+                    governor_position = relation['governor']
+                    dependent_position = relation['dependent']
+                    if governor_position + Before_length == sentence_position + 1 or dependent_position + Before_length == sentence_position + 1:
+                        stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
+                                                        s['tokens'][governor_position - 1]['pos']), relation['dep'], (
+                                                           dependent_position, s['tokens'][dependent_position - 1]['lemma'],
+                                                           s['tokens'][dependent_position - 1]['pos'])))
+                Before_length += len(s['tokens'])
+            # print(len(stored_dependency_list))
+            tmp_data_to_analyze.append({'NP': (NP_position, NP), 'pronoun_related_edge': stored_dependency_list})
+        case_to_analyze_by_example.append(tmp_data_to_analyze)
+    all_data_for_analyze.append(case_to_analyze_by_example)
 with open('test_data_for_analyzing.json', 'w') as f:
     json.dump(all_data_for_analyze, f)
 
@@ -199,19 +201,25 @@ def find_OMCS_match_for_a_coreference_pair(tmp_data, example_id):
     if len(tmp_data) == 0:
         print('This example has no valid data')
         return 0, 0
-    for NP_P_pair in tmp_data:
-        NP = NP_P_pair['NP'][1]
-        for edge in NP_P_pair['pronoun_related_edge']:
-            if edge[0][1] in all_pronouns:
-                tmp_other_word = edge[2][1]
-            else:
-                tmp_other_word = edge[0][1]
-            found_match = False
-            for pair in OMCS_data:
-                if tmp_other_word not in stop_words and verify_match((filter_stop_words(NP, stop_words), [tmp_other_word]), pair[1:]) and edge[1] != 'case':
-                    found_match = True
+    for tmp_pronoun in tmp_data:
+        pronoun_found_match = False
+        for NP_P_pair in tmp_pronoun:
+            NP = NP_P_pair['NP'][1]
+            for edge in NP_P_pair['pronoun_related_edge']:
+                if edge[0][1] in all_pronouns:
+                    tmp_other_word = edge[2][1]
+                else:
+                    tmp_other_word = edge[0][1]
+                found_match = False
+                for pair in OMCS_data:
+                    if tmp_other_word not in stop_words and verify_match((filter_stop_words(NP, stop_words), [tmp_other_word]), pair[1:]) and edge[1] != 'case':
+                        found_match = True
+                        pronoun_found_match = True
+                        break
+                if found_match:
+                    # found_match_pair += 1
                     break
-            if found_match:
+            if pronoun_found_match:
                 found_match_pair += 1
                 break
     print('File', example_id, 'Found_match:', found_match_pair, '/', len(tmp_data), found_match_pair / len(tmp_data))
@@ -226,19 +234,20 @@ def get_match_dict(tmp_data, example_id):
     if len(tmp_data) == 0:
         print('This example has no valid data')
         return local_dict
-    for NP_P_pair in tmp_data:
-        NP = NP_P_pair['NP'][1]
-        for edge in NP_P_pair['pronoun_related_edge']:
-            if edge[0][1] in all_pronouns:
-                tmp_other_word = edge[2][1]
-            else:
-                tmp_other_word = edge[0][1]
-            for pair in OMCS_data:
-                if verify_match((NP, tmp_other_word), pair[1:]) and pair[0] in OMCS_edges:
-                    if edge[1] not in local_dict[pair[0]]:
-                        local_dict[pair[0]][edge[1]] = 0
-                    local_dict[pair[0]][edge[1]] += 1
-    print('File', example_id, 'finished')
+    for tmp_pronoun in tmp_data:
+        for NP_P_pair in tmp_pronoun:
+            NP = NP_P_pair['NP'][1]
+            for edge in NP_P_pair['pronoun_related_edge']:
+                if edge[0][1] in all_pronouns:
+                    tmp_other_word = edge[2][1]
+                else:
+                    tmp_other_word = edge[0][1]
+                for pair in OMCS_data:
+                    if verify_match((NP, tmp_other_word), pair[1:]) and pair[0] in OMCS_edges:
+                        if edge[1] not in local_dict[pair[0]]:
+                            local_dict[pair[0]][edge[1]] = 0
+                        local_dict[pair[0]][edge[1]] += 1
+        print('File', example_id, 'finished')
     return local_dict
 
 
