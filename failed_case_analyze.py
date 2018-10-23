@@ -141,18 +141,18 @@ for i in range(len(all_test_examples)):
                                                            dependent_position,
                                                            s['tokens'][dependent_position - 1]['lemma'],
                                                            s['tokens'][dependent_position - 1]['pos'])))
-                        if relation['dep'] == 'det:qmod':
-                            print(relation)
-                            print('lalala')
+                        # if relation['dep'] == 'det:qmod':
+                        #     print(relation)
+                        #     print('lalala')
                     if relation['dependentGloss'] in all_pronouns and sentence_position <= dependent_position <= sentence_position + 2:
                         stored_dependency_list.append(((governor_position, s['tokens'][governor_position - 1]['lemma'],
                                                         s['tokens'][governor_position - 1]['pos']), relation['dep'], (
                                                            dependent_position,
                                                            s['tokens'][dependent_position - 1]['lemma'],
                                                            s['tokens'][dependent_position - 1]['pos'])))
-                        if relation['dep'] == 'det:qmod':
-                            print(relation)
-                            print('lalala')
+                        # if relation['dep'] == 'det:qmod':
+                        #     print(relation)
+                        #     print('lalala')
 
                 Before_length += len(s['tokens'])
             # print(len(stored_dependency_list))
