@@ -344,6 +344,8 @@ def get_pronoun_related_words(example, pronoun_position):
 
 def post_ranking(example, pronoun_position, top_NPs):
     pronoun_related_words = get_pronoun_related_words(example, pronoun_position)
+    top_NP_words = list()
+
     return top_NPs[0]
 
 
