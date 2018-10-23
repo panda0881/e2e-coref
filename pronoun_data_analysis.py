@@ -70,13 +70,18 @@ if __name__ == "__main__":
             test_data.append(tmp_example)
     print('finish processing data')
 
+    small_data = 0
+    all_data = 0
     for example in test_data:
         for pronoun_type in interested_pronouns:
             for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                 pronoun_span = pronoun_example['pronoun']
-                related_words = get_pronoun_related_words(example, pronoun_span[0])
+                related_words = get_pronoun_related_words(example, pronoun_span)
+                all_data += 1
+                if len(related_words) < 2:
+                    small_data += 1
                 print(len(related_words))
-
+    print(small_data, all_data, small_data/all_data)
 # print(all_count)
 
 print('end')
