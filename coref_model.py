@@ -898,8 +898,9 @@ class CorefModel(object):
                         found_match = False
                         if rank:
                             top_NPs = post_ranking(example, [top_span_starts[pronoun_position], top_span_ends[pronoun_position]], top_NPs)
-                        for tmp_NP in top_NPs:
+                        for i, tmp_NP in enumerate(top_NPs):
                             if verify_correct_NP_match(tmp_NP, correct_NPs, 'cover'):
+                                print('correct position:', i)
                                 found_match = True
                                 break
                         if found_match:

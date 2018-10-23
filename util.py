@@ -388,7 +388,9 @@ def post_ranking(example, pronoun_position, top_NPs):
                 if related_word not in stop_words and verify_match((filter_stop_words(current_NP, stop_words), [related_word]), OMCS_pair[1:]):
                     tmp_score += 1
         NP_match_scores.append(tmp_score)
-    return [top_NPs[NP_match_scores.index(max(NP_match_scores))]]
+    print(NP_match_scores)
+    # return [top_NPs[NP_match_scores.index(max(NP_match_scores))]]
+    return top_NPs
 
 
 
