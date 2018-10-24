@@ -839,7 +839,7 @@ class CorefModel(object):
                                                     reverse=True)
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
                                 if verify_correct_NP_match(
                                         [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
                                         'exact'):
@@ -858,7 +858,7 @@ class CorefModel(object):
                                 break
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
                                 tmp_predicated_pronoun_example['predicated_NPs'].append([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                                 if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
                                     break
@@ -887,7 +887,7 @@ class CorefModel(object):
             all_pronoun_correct_number += coreference_result_by_pronoun[pronoun_type]['correct_coref']
             all_pronoun_numebr += coreference_result_by_pronoun[pronoun_type]['all_coref']
         print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number / all_pronoun_numebr)
-        return data_for_analysis
+        return data_for_analysis, predicated_data
 
     def evaluate_pronoun_coreference_with_filter(self, session, evaluation_data, filter_span=2, rank=False):
         data_for_analysis = list()
