@@ -871,6 +871,7 @@ class CorefModel(object):
 
         # start to predict
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+
             correct_scores = list()
             wrong_scores = list()
             tmp_data_for_analysis = list()
@@ -979,7 +980,7 @@ class CorefModel(object):
             # print('shape:', top_antecedent_scores.shape)
             # print('predicated_antecedents:', predicted_antecedents)
             # print('tmp_data', example['pronoun_coreference_info'])
-
+            print('Result until example:', example_num, '/', len(self.eval_data))
             print(coreference_result_by_pronoun)
             print(coreference_result_by_entity_type)
             print('correct:', sum(correct_scores)/len(correct_scores), 'wrong:', sum(wrong_scores)/len(wrong_scores))
