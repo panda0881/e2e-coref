@@ -776,7 +776,7 @@ class CorefModel(object):
             tmp_entity_dict = dict()
             for detected_entity in example['entities']:
                 tmp_entity_dict[str(detected_entity[0][0]) + '_' + str(detected_entity[0][1])] = detected_entity[1]
-
+            print('number of all NP:', len(all_NPs))
             for pronoun_type in interested_pronouns:
                 valid_NPs = list()
                 if pronoun_type == 'third_personal':
@@ -796,7 +796,7 @@ class CorefModel(object):
                 else:
                     for NP in all_NPs:
                         valid_NPs.append(NP)
-
+                print(pronoun_type, ':', len(valid_NPs))
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                     # print(pronoun_example)
                     pronoun_span = pronoun_example['pronoun']
@@ -863,7 +863,7 @@ class CorefModel(object):
             # print('shape:', top_antecedent_scores.shape)
             # print('predicated_antecedents:', predicted_antecedents)
             # print('tmp_data', example['pronoun_coreference_info'])
-
+            print('Result until example:', example_num, '/', len(self.eval_data))
             print(coreference_result_by_pronoun)
             print(coreference_result_by_entity_type)
             # break
