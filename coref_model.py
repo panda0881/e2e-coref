@@ -887,7 +887,7 @@ class CorefModel(object):
             all_pronoun_correct_number += coreference_result_by_pronoun[pronoun_type]['correct_coref']
             all_pronoun_numebr += coreference_result_by_pronoun[pronoun_type]['all_coref']
         print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number / all_pronoun_numebr)
-        return data_for_analysis, predicated_data
+        return predicated_data
 
     def evaluate_pronoun_coreference_with_filter(self, session, evaluation_data, filter_span=2, rank=False):
         data_for_analysis = list()
