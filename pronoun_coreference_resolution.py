@@ -80,7 +80,7 @@ if __name__ == "__main__":
         # print('we are working on NP-NP')
         # data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=5, rank=False)
 
-        predicated_data = model.evaluate_pronoun_coreference(session, [test_data[0]])
+        predicated_data = model.evaluate_pronoun_coreference(session, test_data)
         # with open('failed_cases.jsonlines', 'w') as f:
         #     for e in data_for_analysis:
         #         f.write(json.dumps(e))
