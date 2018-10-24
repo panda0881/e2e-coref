@@ -131,6 +131,7 @@ parsed_test_data = list()
 with open('predicated_data.jsonlines', 'r') as f:
     counter = 0
     for line in f:
+        print('we are working on example:', counter)
         tmp_example = all_examples[counter]
         counter += 1
         tmp_predicate_result = json.loads(line)
