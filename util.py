@@ -360,12 +360,12 @@ def get_pronoun_related_words(example, pronoun_position):
             dependent_position = relation['dependent']
             if relation[
                 'governorGloss'] in all_pronouns and sentence_position <= governor_position <= sentence_position + 2:
-                if 'dobj' in relation['dep'] or 'nsubj' in relation['dep'] or 'nmod' in relation['dep']:
+                if relation['dep'] in ['dobj', 'nsubj']:
                     related_words.append(relation['dependentGloss'])
 
             if relation[
                 'dependentGloss'] in all_pronouns and sentence_position <= dependent_position <= sentence_position + 2:
-                if 'dobj' in relation['dep'] or 'nsubj' in relation['dep'] or 'nmod' in relation['dep']:
+                if relation['dep'] in ['dobj', 'nsubj']:
                     related_words.append(relation['governorGloss'])
 
         # Before_length += len(s['tokens'])
