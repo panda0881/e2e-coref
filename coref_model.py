@@ -747,7 +747,7 @@ class CorefModel(object):
             parsed_NPs = list()
             for tmp_NP in example['all_NP']:
                 found_overlap_NP = False
-                for NP in parsed_NPs:
+                for NP in all_NPs:
                     if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
                         found_overlap_NP = True
                         break
