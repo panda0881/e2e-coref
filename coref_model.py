@@ -834,7 +834,7 @@ class CorefModel(object):
                                                     reverse=True)
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
                                 if verify_correct_NP_match(
                                         [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
                                         'exact'):
@@ -911,19 +911,19 @@ class CorefModel(object):
             for conll_NP in example['pronoun_coreference_info']['all_NP']:
                 if conll_NP not in all_NPs:
                     all_NPs.append(conll_NP)
-            parsed_NPs = list()
-            for tmp_NP in example['all_NP']:
-                found_overlap_NP = False
-                for NP in all_NPs:
-                    if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
-                        found_overlap_NP = True
-                        break
-                    if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
-                        found_overlap_NP = True
-                        break
-                if not found_overlap_NP:
-                    parsed_NPs.append(tmp_NP)
-            all_NPs += parsed_NPs
+            # parsed_NPs = list()
+            # for tmp_NP in example['all_NP']:
+            #     found_overlap_NP = False
+            #     for NP in all_NPs:
+            #         if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
+            #             found_overlap_NP = True
+            #             break
+            #         if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
+            #             found_overlap_NP = True
+            #             break
+            #     if not found_overlap_NP:
+            #         parsed_NPs.append(tmp_NP)
+            # all_NPs += parsed_NPs
 
             tmp_entity_dict = dict()
             for detected_entity in example['entities']:
