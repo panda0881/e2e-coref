@@ -231,9 +231,9 @@ with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
                     if NP_keyword in word2id:
                         for related_word in related_words:
                             if related_word[0] == 'nsubj' and related_word[1] in word2id:
-                                tmp_occurance += nsubj_count[(related_word[1], NP_keyword)]
+                                tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
                             if related_word[0] == 'dobj' and related_word[1] in word2id:
-                                tmp_occurance += dobj_count[(related_word[1], NP_keyword)]
+                                tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
                     gold_NP_scores.append(tmp_occurance)
                 for NP_keyword in predicated_NP_keywords:
                     tmp_occurance = 0
