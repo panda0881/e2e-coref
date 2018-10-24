@@ -1000,9 +1000,9 @@ class CorefModel(object):
                             if verify_correct_NP_match(tmp_NP, correct_NPs, 'exact'):
                                 print('correct position:', i)
                                 found_match = True
-                                correct_scores.append(NP_match_scores[i])
-                            else:
-                                wrong_scores.append(NP_match_scores[i])
+                            #     correct_scores.append(NP_match_scores[i])
+                            # else:
+                            #     wrong_scores.append(NP_match_scores[i])
 
                         if found_match:
                             coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
