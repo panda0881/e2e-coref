@@ -1033,7 +1033,7 @@ class CorefModel(object):
             print('Result until example:', example_num, '/', len(self.eval_data))
             print(coreference_result_by_pronoun)
             print(coreference_result_by_entity_type)
-            print('correct:', sum(correct_scores)/len(correct_scores), 'wrong:', sum(wrong_scores)/len(wrong_scores))
+            # print('correct:', sum(correct_scores)/len(correct_scores), 'wrong:', sum(wrong_scores)/len(wrong_scores))
             # break
         all_pronoun_correct_number = 0
         all_pronoun_numebr = 0
