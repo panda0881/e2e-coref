@@ -197,7 +197,7 @@ nsubj_count = wiki_count['nsubj']
 dobj_count = wiki_count['dobj']
 print(wiki_count.keys())
 
-with open('predicated_data.jsonlines', 'r') as f:
+with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
     counter = 0
     for line in f:
         print('we are working on example:', counter)
