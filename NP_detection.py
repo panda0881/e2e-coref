@@ -10,7 +10,6 @@ tmp_nlp = nlp_list[0]
 
 
 def detect_sub_structure(input_parsed_result, starting_position=0):
-    all_sub_structures = list()
     tmp_data = input_parsed_result[1:-1]
     tag = tmp_data.split(' ')[0]
     current_NP = []
@@ -23,6 +22,7 @@ def detect_sub_structure(input_parsed_result, starting_position=0):
             if c == ')':
                 if last_triger == '(':
                     word_counter += 1
+                last_triger = ')'
         current_NP.append([starting_position, starting_position + word_counter - 1])
 
     front_counter = 0
@@ -31,6 +31,7 @@ def detect_sub_structure(input_parsed_result, starting_position=0):
     last_triger = ''
     word_counter = 0
     previous_word_counter = 0
+    all_sub_structures = list()
     for c in tmp_data:
         if c == '(':
             front_counter += 1
