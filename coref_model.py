@@ -130,19 +130,19 @@ class CorefModel(object):
         for conll_NP in example['pronoun_coreference_info']['all_NP']:
             if conll_NP not in all_NPs:
                 all_NPs.append(conll_NP)
-        parsed_NPs = list()
-        for tmp_NP in example['all_NP']:
-            found_overlap_NP = False
-            for NP in all_NPs:
-                if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
-                    found_overlap_NP = True
-                    break
-                if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
-                    found_overlap_NP = True
-                    break
-            if not found_overlap_NP:
-                parsed_NPs.append(tmp_NP)
-        all_NPs += parsed_NPs
+        # parsed_NPs = list()
+        # for tmp_NP in example['all_NP']:
+        #     found_overlap_NP = False
+        #     for NP in all_NPs:
+        #         if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
+        #             found_overlap_NP = True
+        #             break
+        #         if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
+        #             found_overlap_NP = True
+        #             break
+        #     if not found_overlap_NP:
+        #         parsed_NPs.append(tmp_NP)
+        # all_NPs += parsed_NPs
         tmp_gold_mentions = [tuple(m) for m in util.flatten(clusters)]
         for tmp_NP in all_NPs:
             if tuple(tmp_NP) not in tmp_gold_mentions:
