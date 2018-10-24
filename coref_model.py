@@ -1000,6 +1000,7 @@ class CorefModel(object):
                             if verify_correct_NP_match(tmp_NP, correct_NPs, 'exact'):
                                 print('correct position:', i)
                                 found_match = True
+                                break
                             #     correct_scores.append(NP_match_scores[i])
                             # else:
                             #     wrong_scores.append(NP_match_scores[i])
