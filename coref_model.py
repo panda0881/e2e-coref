@@ -870,10 +870,11 @@ class CorefModel(object):
         coreference_result_by_entity_type['Others'] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
 
         # start to predict
+        correct_scores = list()
+        wrong_scores = list()
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
 
-            correct_scores = list()
-            wrong_scores = list()
+
             tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
