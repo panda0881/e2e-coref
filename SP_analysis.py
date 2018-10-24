@@ -196,6 +196,7 @@ with open('SP/pairs_count.pkl', 'rb') as f:
 nsubj_count = wiki_count['nsubj']
 dobj_count = wiki_count['dobj']
 print(wiki_count.keys())
+print(list(nsubj_count.keys())[:10])
 
 with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
     counter = 0
