@@ -321,7 +321,7 @@ def get_coverage(w_list1, w_list2):
     return tmp_count / len(w_list1)
 
 
-def verify_match(coreference_pair, OMCS_pair, limitation=0.7):
+def verify_match(coreference_pair, OMCS_pair, limitation=0.9):
     if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1],
                                                                                       OMCS_pair[1]) >= limitation:
         return True
