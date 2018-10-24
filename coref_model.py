@@ -748,7 +748,9 @@ class CorefModel(object):
         coreference_result_by_entity_type['Others'] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
 
         # start to predict
+        predicated_data = list()
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            tmp_predicated_data = dict()
             tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
@@ -779,6 +781,7 @@ class CorefModel(object):
                 tmp_entity_dict[str(detected_entity[0][0]) + '_' + str(detected_entity[0][1])] = detected_entity[1]
             print('number of all NP:', len(all_NPs))
             for pronoun_type in interested_pronouns:
+                tmp_predicated_data[pronoun_type] = list()
                 valid_NPs = list()
                 if pronoun_type == 'third_personal':
                     for NP in all_NPs:
@@ -799,6 +802,8 @@ class CorefModel(object):
                         valid_NPs.append(NP)
                 print(pronoun_type, ':', len(valid_NPs))
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
+                    tmp_predicated_pronoun_example = pronoun_example
+                    tmp_predicated_pronoun_example['predicated_NPs'] = list()
                     # print(pronoun_example)
                     pronoun_span = pronoun_example['pronoun']
                     correct_NPs = pronoun_example['NPs']
@@ -851,8 +856,16 @@ class CorefModel(object):
                                     coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
                                     coreference_result_by_entity_type[most_entity_type]['all_coref']
                                 break
+                        for i in range(len(sorted_antecedents)):
+                            tmp_NP_position = int(sorted_antecedents[i])
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
+                                tmp_predicated_pronoun_example['predicated_NPs'].append([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
+                                if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
+                                    break
+                    tmp_predicated_data[pronoun_type].append(tmp_predicated_pronoun_example)
             print('length of collected example for analysis:', len(tmp_data_for_analysis))
             data_for_analysis.append(tmp_data_for_analysis)
+            predicated_data.append(tmp_predicated_data)
 
             # print('top_span_starts:', top_span_starts)
             # print('shape:', top_span_starts.shape)
