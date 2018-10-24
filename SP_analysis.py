@@ -181,9 +181,11 @@ with open('predicated_data.jsonlines', 'r') as f:
 
 print(gold_NP_sentence_distance_dict)
 
-with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
+with open('parsed_test_pronoun_example.jsonlines', 'w') as f:
     for e in parsed_test_data:
         f.write(json.dumps(e))
         f.write('\n')
 
 print('end')
+
+
