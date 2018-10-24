@@ -773,7 +773,30 @@ class CorefModel(object):
                 if not found_overlap_NP:
                     parsed_NPs.append(tmp_NP)
             all_NPs += parsed_NPs
+            tmp_entity_dict = dict()
+            for detected_entity in example['entities']:
+                tmp_entity_dict[str(detected_entity[0][0]) + '_' + str(detected_entity[0][1])] = detected_entity[1]
+
             for pronoun_type in interested_pronouns:
+                valid_NPs = list()
+                if pronoun_type == 'third_personal':
+                    for NP in all_NPs:
+                        if str(NP[0]) + '_' + str(NP[1]) not in tmp_entity_dict:
+                            valid_NPs.append(NP)
+                        else:
+                            if tmp_entity_dict[str(NP[0]) + '_' + str(NP[1])] == 'PERSON':
+                                valid_NPs.append(NP)
+                elif pronoun_type == 'neutral':
+                    for NP in all_NPs:
+                        if str(NP[0]) + '_' + str(NP[1]) not in tmp_entity_dict:
+                            valid_NPs.append(NP)
+                        else:
+                            if tmp_entity_dict[str(NP[0]) + '_' + str(NP[1])] != 'PERSON':
+                                valid_NPs.append(NP)
+                else:
+                    for NP in all_NPs:
+                        valid_NPs.append(NP)
+
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                     # print(pronoun_example)
                     pronoun_span = pronoun_example['pronoun']
@@ -810,7 +833,7 @@ class CorefModel(object):
                                                     reverse=True)
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
                                 if verify_correct_NP_match(
                                         [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
                                         'exact'):
@@ -901,7 +924,32 @@ class CorefModel(object):
                     parsed_NPs.append(tmp_NP)
             all_NPs += parsed_NPs
 
+            tmp_entity_dict = dict()
+            for detected_entity in example['entities']:
+                tmp_entity_dict[str(detected_entity[0][0])+'_'+str(detected_entity[0][1])] = detected_entity[1]
+
             for pronoun_type in interested_pronouns:
+                valid_NPs = list()
+                if pronoun_type == 'third_personal':
+                    for NP in all_NPs:
+                        if str(NP[0])+'_'+str(NP[1]) not in tmp_entity_dict:
+                            valid_NPs.append(NP)
+                        else:
+                            if tmp_entity_dict[str(NP[0])+'_'+str(NP[1])] == 'PERSON':
+                                valid_NPs.append(NP)
+                elif pronoun_type == 'neutral':
+                    for NP in all_NPs:
+                        if str(NP[0])+'_'+str(NP[1]) not in tmp_entity_dict:
+                            valid_NPs.append(NP)
+                        else:
+                            if tmp_entity_dict[str(NP[0])+'_'+str(NP[1])] != 'PERSON':
+                                valid_NPs.append(NP)
+                else:
+                    for NP in all_NPs:
+                        valid_NPs.append(NP)
+
+
+
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                     # print(pronoun_example)
                     pronoun_span = pronoun_example['pronoun']
@@ -939,7 +987,7 @@ class CorefModel(object):
                         top_NPs = list()
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in all_NPs:
+                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
                                 top_NPs.append([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                                 if len(top_NPs) >= filter_span:
                                     break

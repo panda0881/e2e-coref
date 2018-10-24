@@ -372,6 +372,9 @@ def get_pronoun_related_words(example, pronoun_position):
     return related_words
 
 
+# def filter_NP_based_on_ner()
+
+
 def post_ranking(example, pronoun_position, top_NPs):
     if len(top_NPs) == 0:
         return []
