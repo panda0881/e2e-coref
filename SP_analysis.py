@@ -232,9 +232,11 @@ with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
                     if NP_keyword in word2id:
                         for related_word in related_words:
                             if related_word[0] == 'nsubj' and related_word[1] in word2id:
-                                tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
+                                if (word2id[related_word[1]], word2id[NP_keyword]) in nsubj_count:
+                                    tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
                             if related_word[0] == 'dobj' and related_word[1] in word2id:
-                                tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
+                                if (word2id[related_word[1]], word2id[NP_keyword]) in dobj_count:
+                                    tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
                     gold_NP_scores.append(tmp_occurance)
                 for NP_keyword in predicated_NP_keywords:
                     tmp_occurance = 0
@@ -247,7 +249,11 @@ with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
                     predicated_NP_scores.append(tmp_occurance)
                 counted_pronoun_example['gold_NP_scores'] = gold_NP_scores
                 counted_pronoun_example['predicated_NP_scores'] = predicated_NP_scores
+                print(related_words)
                 print(predicated_NP_scores)
+                print(predicated_NP_keywords)
+                print(predicated_NP_words)
+
                 tmp_parsed_date[pronoun_type].append(counted_pronoun_example)
         parsed_test_data.append(tmp_parsed_date)
 
