@@ -760,7 +760,7 @@ class CorefModel(object):
             for conll_NP in example['pronoun_coreference_info']['all_NP']:
                 if conll_NP not in all_NPs:
                     all_NPs.append(conll_NP)
-            print('Number of gold NP:', all_NPs)
+            print('Number of gold NP:', len(all_NPs))
             parsed_NPs = list()
             for tmp_NP in example['all_NP']:
                 found_overlap_NP = False
