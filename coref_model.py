@@ -856,10 +856,22 @@ class CorefModel(object):
                                     coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
                                     coreference_result_by_entity_type[most_entity_type]['all_coref']
                                 break
+                        valid_NP_positions = list()
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
-                                tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_NP_position]), int(top_span_ends[tmp_NP_position]), float(antecedence_to_score[str(tmp_NP_position)])])
+                                valid_NP_positions.append(tmp_NP_position)
+                        if len(valid_NP_positions)>0:
+                            first_score = float(antecedence_to_score[str(valid_NP_positions[0])])
+                            if first_score > 0:
+                                for tmp_valid_NP_position in valid_NP_positions:
+                                    if float(antecedence_to_score[str(tmp_valid_NP_position)]) > 0:
+                                        tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position])])
+                                if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
+                                    break
+                            else:
+                                for tmp_valid_NP_position in valid_NP_positions:
+                                    tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position])])
                                 if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
                                     break
                     tmp_predicated_data[pronoun_type].append(tmp_predicated_pronoun_example)
