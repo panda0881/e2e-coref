@@ -871,6 +871,8 @@ class CorefModel(object):
 
         # start to predict
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            correct_scores = list()
+            wrong_scores = list()
             tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
@@ -940,13 +942,17 @@ class CorefModel(object):
                                 if len(top_NPs) >= filter_span:
                                     break
                         found_match = False
+                        NP_match_scores = list()
                         if rank:
-                            top_NPs = post_ranking(example, [top_span_starts[pronoun_position], top_span_ends[pronoun_position]], top_NPs)
+                            top_NPs, NP_match_scores = post_ranking(example, [top_span_starts[pronoun_position], top_span_ends[pronoun_position]], top_NPs)
                         for i, tmp_NP in enumerate(top_NPs):
                             if verify_correct_NP_match(tmp_NP, correct_NPs, 'exact'):
                                 print('correct position:', i)
                                 found_match = True
-                                break
+                                correct_scores.append(NP_match_scores[i])
+                            else:
+                                wrong_scores.append(NP_match_scores[i])
+
                         if found_match:
                             coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
                             coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
@@ -976,6 +982,7 @@ class CorefModel(object):
 
             print(coreference_result_by_pronoun)
             print(coreference_result_by_entity_type)
+            print('correct:', sum(correct_scores)/len(correct_scores), 'wrong:', sum(wrong_scores)/len(wrong_scores))
             # break
         all_pronoun_correct_number = 0
         all_pronoun_numebr = 0

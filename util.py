@@ -393,7 +393,7 @@ def post_ranking(example, pronoun_position, top_NPs):
                     tmp_score += 1
         NP_match_scores.append(tmp_score)
     print(NP_match_scores)
-    return [top_NPs[NP_match_scores.index(max(NP_match_scores))]]
+    return top_NPs, NP_match_scores
     # return top_NPs
 
 

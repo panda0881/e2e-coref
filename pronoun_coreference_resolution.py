@@ -78,13 +78,13 @@ if __name__ == "__main__":
         model.restore(session)
 
         # print('we are working on NP-NP')
-        # data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=2, rank=True)
+        data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=2, rank=True)
 
-        data_for_analysis = model.evaluate_pronoun_coreference(session, test_data)
-        with open('failed_cases.jsonlines', 'w') as f:
-            for e in data_for_analysis:
-                f.write(json.dumps(e))
-                f.write('\n')
+        # data_for_analysis = model.evaluate_pronoun_coreference(session, test_data)
+        # with open('failed_cases.jsonlines', 'w') as f:
+        #     for e in data_for_analysis:
+        #         f.write(json.dumps(e))
+        #         f.write('\n')
 
 # print(all_count)
 
