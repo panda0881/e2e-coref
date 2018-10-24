@@ -859,7 +859,7 @@ class CorefModel(object):
                         for i in range(len(sorted_antecedents)):
                             tmp_NP_position = int(sorted_antecedents[i])
                             if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
-                                tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_NP_position]), int(top_span_ends[tmp_NP_position], float(top_antecedent_scores[pronoun_position][tmp_NP_position + 1]))])
+                                tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_NP_position]), int(top_span_ends[tmp_NP_position]), float(antecedence_to_score[str(tmp_NP_position)])])
                                 if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
                                     break
                     tmp_predicated_data[pronoun_type].append(tmp_predicated_pronoun_example)
