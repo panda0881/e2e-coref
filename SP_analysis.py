@@ -185,93 +185,7 @@ with open('test.english.jsonlines', 'r') as f:
 
 gold_NP_sentence_distance_dict = dict()
 parsed_test_data = list()
-with open('predicated_data.jsonlines', 'r') as f:
-    counter = 0
-    for line in f:
-        print('we are working on example:', counter)
-        tmp_example = all_examples[counter]
-        counter += 1
-        tmp_predicate_result = json.loads(line)
-        all_sentence = list()
-        for s in tmp_example['sentences']:
-            all_sentence += s
-        tmp_parsed_date = dict()
-        for pronoun_type in interested_pronouns:
-            tmp_parsed_date[pronoun_type] = list()
-            for pronoun_example in tmp_predicate_result[pronoun_type]:
-                parsed_pronoun_example = pronoun_example
-                pronoun_span = pronoun_example['pronoun']
-                related_words = get_pronoun_related_words(tmp_example, pronoun_span)
-                pronoun_sentence_index = find_sentence_index(tmp_example, pronoun_span)
-                current_sentence = tmp_example['sentences'][pronoun_sentence_index]
-                gold_NPs = pronoun_example['NPs']
-                gold_NP_words = list()
-                gold_NP_sentence_index = list()
-                gold_NP_keywords = list()
-                gold_NP_features = list()
-                predicated_NPs = pronoun_example['predicated_NPs']
-                predicated_NP_words = list()
-                predicated_NP_index = list()
-                predicated_NP_keywords = list()
-                predicated_NP_features = list()
-                for NP in gold_NPs:
-                    gold_NP_words.append(all_sentence[NP[0]:NP[1]+1])
-                    gold_NP_sentence_index.append(find_sentence_index(tmp_example, NP[:2]))
-                    if str(find_sentence_index(tmp_example, NP)-find_sentence_index(tmp_example, pronoun_span)) not in gold_NP_sentence_distance_dict:
-                        gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] = 0
-                    gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] += 1
-                    gold_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1]+1]))
-                    gold_NP_features.append(get_feature_for_NP(tmp_example, NP[:2]))
-                for NP in predicated_NPs:
-                    predicated_NP_words.append(all_sentence[NP[0]:NP[1]+1])
-                    predicated_NP_index.append(find_sentence_index(tmp_example, NP[:2]))
-                    predicated_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1] + 1]))
-                    predicated_NP_features.append(get_feature_for_NP(tmp_example, NP[:2]))
-
-                parsed_pronoun_example['related_words'] = related_words
-                parsed_pronoun_example['pronoun_sentence_index'] = pronoun_sentence_index
-                parsed_pronoun_example['current_sentence'] = current_sentence
-                parsed_pronoun_example['gold_NP_words'] = gold_NP_words
-                parsed_pronoun_example['gold_NP_sentence_index'] = gold_NP_sentence_index
-                parsed_pronoun_example['gold_NP_keywords'] = gold_NP_keywords
-                parsed_pronoun_example['gold_NP_features'] = gold_NP_features
-                parsed_pronoun_example['predicated_NP_words'] = predicated_NP_words
-                parsed_pronoun_example['predicated_NP_index'] = predicated_NP_index
-                parsed_pronoun_example['predicated_NP_keywords'] = predicated_NP_keywords
-                parsed_pronoun_example['predicated_NP_keywords'] = predicated_NP_features
-                tmp_parsed_date[pronoun_type].append(parsed_pronoun_example)
-        parsed_test_data.append(tmp_parsed_date)
-        # print('lalala')
-
-print(gold_NP_sentence_distance_dict)
-
-with open('parsed_test_pronoun_example.jsonlines', 'w') as f:
-    for e in parsed_test_data:
-        f.write(json.dumps(e))
-        f.write('\n')
-
-print(len(parsed_test_data))
-
-
-all_predicated_exmaples = list()
-with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
-    counter = 0
-    for line in f:
-        all_predicated_exmaples.append(json.loads(line))
-
-
-# with open('SP/corpus_stats.pkl', 'rb') as f:
-#     corpus_stats = pickle.load(f)
-# # #
-# word2id = corpus_stats['word2id']
-# with open('SP/pairs_count.pkl', 'rb') as f:
-#     wiki_count = pickle.load(f)
-# nsubj_count = wiki_count['nsubj']
-# dobj_count = wiki_count['dobj']
-# print(wiki_count.keys())
-# print(list(nsubj_count.keys())[:10])
-#
-# with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
+# with open('predicated_data.jsonlines', 'r') as f:
 #     counter = 0
 #     for line in f:
 #         print('we are working on example:', counter)
@@ -284,66 +198,152 @@ with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
 #         tmp_parsed_date = dict()
 #         for pronoun_type in interested_pronouns:
 #             tmp_parsed_date[pronoun_type] = list()
-#             for parsed_pronoun_example in tmp_predicate_result[pronoun_type]:
-#                 counted_pronoun_example = parsed_pronoun_example
-#                 pronoun_span = parsed_pronoun_example['pronoun']
-#                 related_words = parsed_pronoun_example['related_words']
-#                 pronoun_sentence_index = parsed_pronoun_example['pronoun_sentence_index']
-#                 current_sentence = parsed_pronoun_example['current_sentence']
-#                 gold_NPs = parsed_pronoun_example['NPs']
-#                 gold_NP_words = parsed_pronoun_example['gold_NP_words']
-#                 gold_NP_sentence_index = parsed_pronoun_example['gold_NP_sentence_index']
-#                 gold_NP_keywords = parsed_pronoun_example['gold_NP_keywords']
-#                 predicated_NPs = parsed_pronoun_example['predicated_NPs']
-#                 predicated_NP_words = parsed_pronoun_example['predicated_NP_words']
-#                 predicated_NP_index = parsed_pronoun_example['predicated_NP_index']
-#                 predicated_NP_keywords = parsed_pronoun_example['predicated_NP_keywords']
-#                 gold_NP_scores = list()
-#                 predicated_NP_scores = list()
-#                 for i, NP_keyword in enumerate(gold_NP_keywords):
-#                     for e in tmp_example['entities']:
-#                         if gold_NPs[i][0] == e[0][0] and gold_NPs[i][1] == e[0][1]:
-#                             NP_keyword = e[1].lower()
-#                     tmp_occurance = 0
-#                     if NP_keyword in word2id:
-#                         for related_word in related_words:
-#                             if related_word[0] == 'nsubj' and related_word[1] in word2id:
-#                                 if (word2id[related_word[1]], word2id[NP_keyword]) in nsubj_count:
-#                                     tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
-#                             if related_word[0] == 'dobj' and related_word[1] in word2id:
-#                                 if (word2id[related_word[1]], word2id[NP_keyword]) in dobj_count:
-#                                     tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
-#                     gold_NP_scores.append(tmp_occurance)
-#                 for i, NP_keyword in enumerate(predicated_NP_keywords):
-#                     for e in tmp_example['entities']:
-#                         if predicated_NPs[i][0] == e[0][0] and predicated_NPs[i][1] == e[0][1]:
-#                             NP_keyword = e[1].lower()
-#                     tmp_occurance = 0
-#                     if NP_keyword in word2id:
-#                         for related_word in related_words:
-#                             if related_word[0] == 'nsubj' and related_word[1] in word2id:
-#                                 if (word2id[related_word[1]], word2id[NP_keyword]) in nsubj_count:
-#                                     tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
-#                             if related_word[0] == 'dobj' and related_word[1] in word2id:
-#                                 if (word2id[related_word[1]], word2id[NP_keyword]) in dobj_count:
-#                                     tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
-#                     predicated_NP_scores.append(tmp_occurance)
-#                 counted_pronoun_example['gold_NP_scores'] = gold_NP_scores
-#                 counted_pronoun_example['predicated_NP_scores'] = predicated_NP_scores
-#                 # print(related_words)
-#                 # print(predicated_NP_scores)
-#                 # print(predicated_NP_keywords)
-#                 # print(predicated_NP_words)
+#             for pronoun_example in tmp_predicate_result[pronoun_type]:
+#                 parsed_pronoun_example = pronoun_example
+#                 pronoun_span = pronoun_example['pronoun']
+#                 related_words = get_pronoun_related_words(tmp_example, pronoun_span)
+#                 pronoun_sentence_index = find_sentence_index(tmp_example, pronoun_span)
+#                 current_sentence = tmp_example['sentences'][pronoun_sentence_index]
+#                 gold_NPs = pronoun_example['NPs']
+#                 gold_NP_words = list()
+#                 gold_NP_sentence_index = list()
+#                 gold_NP_keywords = list()
+#                 gold_NP_features = list()
+#                 predicated_NPs = pronoun_example['predicated_NPs']
+#                 predicated_NP_words = list()
+#                 predicated_NP_index = list()
+#                 predicated_NP_keywords = list()
+#                 predicated_NP_features = list()
+#                 for NP in gold_NPs:
+#                     gold_NP_words.append(all_sentence[NP[0]:NP[1]+1])
+#                     gold_NP_sentence_index.append(find_sentence_index(tmp_example, NP[:2]))
+#                     if str(find_sentence_index(tmp_example, NP)-find_sentence_index(tmp_example, pronoun_span)) not in gold_NP_sentence_distance_dict:
+#                         gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] = 0
+#                     gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] += 1
+#                     gold_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1]+1]))
+#                     gold_NP_features.append(get_feature_for_NP(tmp_example, NP[:2]))
+#                 for NP in predicated_NPs:
+#                     predicated_NP_words.append(all_sentence[NP[0]:NP[1]+1])
+#                     predicated_NP_index.append(find_sentence_index(tmp_example, NP[:2]))
+#                     predicated_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1] + 1]))
+#                     predicated_NP_features.append(get_feature_for_NP(tmp_example, NP[:2]))
 #
-#                 tmp_parsed_date[pronoun_type].append(counted_pronoun_example)
+#                 parsed_pronoun_example['related_words'] = related_words
+#                 parsed_pronoun_example['pronoun_sentence_index'] = pronoun_sentence_index
+#                 parsed_pronoun_example['current_sentence'] = current_sentence
+#                 parsed_pronoun_example['gold_NP_words'] = gold_NP_words
+#                 parsed_pronoun_example['gold_NP_sentence_index'] = gold_NP_sentence_index
+#                 parsed_pronoun_example['gold_NP_keywords'] = gold_NP_keywords
+#                 parsed_pronoun_example['gold_NP_features'] = gold_NP_features
+#                 parsed_pronoun_example['predicated_NP_words'] = predicated_NP_words
+#                 parsed_pronoun_example['predicated_NP_index'] = predicated_NP_index
+#                 parsed_pronoun_example['predicated_NP_keywords'] = predicated_NP_keywords
+#                 parsed_pronoun_example['predicated_NP_keywords'] = predicated_NP_features
+#                 tmp_parsed_date[pronoun_type].append(parsed_pronoun_example)
 #         parsed_test_data.append(tmp_parsed_date)
+#         # print('lalala')
 #
-# print(len(parsed_test_data))
+# print(gold_NP_sentence_distance_dict)
 #
 # with open('parsed_test_pronoun_example.jsonlines', 'w') as f:
 #     for e in parsed_test_data:
 #         f.write(json.dumps(e))
 #         f.write('\n')
+#
+# print(len(parsed_test_data))
+
+
+all_predicated_exmaples = list()
+with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
+    counter = 0
+    for line in f:
+        all_predicated_exmaples.append(json.loads(line))
+
+
+with open('SP/corpus_stats.pkl', 'rb') as f:
+    corpus_stats = pickle.load(f)
+# #
+word2id = corpus_stats['word2id']
+with open('SP/pairs_count.pkl', 'rb') as f:
+    wiki_count = pickle.load(f)
+nsubj_count = wiki_count['nsubj']
+dobj_count = wiki_count['dobj']
+print(wiki_count.keys())
+print(list(nsubj_count.keys())[:10])
+
+with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
+    counter = 0
+    for line in f:
+        print('we are working on example:', counter)
+        tmp_example = all_examples[counter]
+        counter += 1
+        tmp_predicate_result = json.loads(line)
+        all_sentence = list()
+        for s in tmp_example['sentences']:
+            all_sentence += s
+        tmp_parsed_date = dict()
+        for pronoun_type in interested_pronouns:
+            tmp_parsed_date[pronoun_type] = list()
+            for parsed_pronoun_example in tmp_predicate_result[pronoun_type]:
+                counted_pronoun_example = parsed_pronoun_example
+                pronoun_span = parsed_pronoun_example['pronoun']
+                related_words = parsed_pronoun_example['related_words']
+                pronoun_sentence_index = parsed_pronoun_example['pronoun_sentence_index']
+                current_sentence = parsed_pronoun_example['current_sentence']
+                gold_NPs = parsed_pronoun_example['NPs']
+                gold_NP_words = parsed_pronoun_example['gold_NP_words']
+                gold_NP_sentence_index = parsed_pronoun_example['gold_NP_sentence_index']
+                gold_NP_keywords = parsed_pronoun_example['gold_NP_keywords']
+                predicated_NPs = parsed_pronoun_example['predicated_NPs']
+                predicated_NP_words = parsed_pronoun_example['predicated_NP_words']
+                predicated_NP_index = parsed_pronoun_example['predicated_NP_index']
+                predicated_NP_keywords = parsed_pronoun_example['predicated_NP_keywords']
+                gold_NP_scores = list()
+                predicated_NP_scores = list()
+                for i, NP_keyword in enumerate(gold_NP_keywords):
+                    for e in tmp_example['entities']:
+                        if gold_NPs[i][0] == e[0][0] and gold_NPs[i][1] == e[0][1]:
+                            NP_keyword = e[1].lower()
+                    tmp_occurance = 0
+                    if NP_keyword in word2id:
+                        for related_word in related_words:
+                            if related_word[0] == 'nsubj' and related_word[1] in word2id:
+                                if (word2id[related_word[1]], word2id[NP_keyword]) in nsubj_count:
+                                    tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
+                            if related_word[0] == 'dobj' and related_word[1] in word2id:
+                                if (word2id[related_word[1]], word2id[NP_keyword]) in dobj_count:
+                                    tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
+                    gold_NP_scores.append(tmp_occurance)
+                for i, NP_keyword in enumerate(predicated_NP_keywords):
+                    for e in tmp_example['entities']:
+                        if predicated_NPs[i][0] == e[0][0] and predicated_NPs[i][1] == e[0][1]:
+                            NP_keyword = e[1].lower()
+                    tmp_occurance = 0
+                    if NP_keyword in word2id:
+                        for related_word in related_words:
+                            if related_word[0] == 'nsubj' and related_word[1] in word2id:
+                                if (word2id[related_word[1]], word2id[NP_keyword]) in nsubj_count:
+                                    tmp_occurance += nsubj_count[(word2id[related_word[1]], word2id[NP_keyword])]
+                            if related_word[0] == 'dobj' and related_word[1] in word2id:
+                                if (word2id[related_word[1]], word2id[NP_keyword]) in dobj_count:
+                                    tmp_occurance += dobj_count[(word2id[related_word[1]], word2id[NP_keyword])]
+                    predicated_NP_scores.append(tmp_occurance)
+                counted_pronoun_example['gold_NP_scores'] = gold_NP_scores
+                counted_pronoun_example['predicated_NP_scores'] = predicated_NP_scores
+                # print(related_words)
+                # print(predicated_NP_scores)
+                # print(predicated_NP_keywords)
+                # print(predicated_NP_words)
+
+                tmp_parsed_date[pronoun_type].append(counted_pronoun_example)
+        parsed_test_data.append(tmp_parsed_date)
+
+print(len(parsed_test_data))
+
+with open('parsed_test_pronoun_example.jsonlines', 'w') as f:
+    for e in parsed_test_data:
+        f.write(json.dumps(e))
+        f.write('\n')
 # correct_scores = list()
 # wrong_scores = list()
 # # #
