@@ -54,6 +54,7 @@ nlp_list = [StanfordCoreNLP('http://localhost:900%d' % (i)) for i in range(no_nl
 
 tmp_nlp = nlp_list[0]
 
+
 def get_pronoun_related_words(example, pronoun_position):
     related_words = list()
     separate_sentence_range = list()
@@ -125,7 +126,7 @@ with open('test.english.jsonlines', 'r') as f:
         all_examples.append(tmp_example)
 
 # interested_pronouns = ['third_personal', 'neutral', 'demonstrative', 'possessive']
-interested_pronouns = ['third_personal']
+# interested_pronouns = ['third_personal']
 
 gold_NP_sentence_distance_dict = dict()
 parsed_test_data = list()
