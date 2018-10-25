@@ -265,10 +265,10 @@ with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
                     predicated_NP_scores.append(tmp_occurance)
                 counted_pronoun_example['gold_NP_scores'] = gold_NP_scores
                 counted_pronoun_example['predicated_NP_scores'] = predicated_NP_scores
-                print(related_words)
-                print(predicated_NP_scores)
-                print(predicated_NP_keywords)
-                print(predicated_NP_words)
+                # print(related_words)
+                # print(predicated_NP_scores)
+                # print(predicated_NP_keywords)
+                # print(predicated_NP_words)
 
                 tmp_parsed_date[pronoun_type].append(counted_pronoun_example)
         parsed_test_data.append(tmp_parsed_date)
