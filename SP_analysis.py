@@ -127,6 +127,8 @@ def get_feature_for_NP(example, NP_span):
     tmp_all_sentence = list()
     for tmp_s in example['sentences']:
         tmp_all_sentence += tmp_s
+    print(NP_span)
+    print(len(tmp_all_sentence))
     NP_words = tmp_all_sentence[NP_span[0]:NP_span[1] + 1]
     tmp_s = ''
     for w in NP_words:
