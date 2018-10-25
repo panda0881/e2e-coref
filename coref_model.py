@@ -801,8 +801,9 @@ class CorefModel(object):
                     for NP in all_NPs:
                         valid_NPs.append(NP)
                 print(pronoun_type, ':', len(valid_NPs))
-                print('number of examples', len(example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]))
+                print('number of examples', pronoun_type, len(example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]))
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
+                    print(pronoun_type, 'found one')
                     coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
                     tmp_predicated_pronoun_example = pronoun_example
                     tmp_predicated_pronoun_example['predicated_NPs'] = list()
