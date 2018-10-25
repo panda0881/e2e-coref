@@ -127,8 +127,8 @@ def get_feature_for_NP(example, NP_span):
     tmp_all_sentence = list()
     for tmp_s in example['sentences']:
         tmp_all_sentence += tmp_s
-    print(NP_span)
-    print(len(tmp_all_sentence))
+    # print(NP_span)
+    # print(len(tmp_all_sentence))
     NP_words = tmp_all_sentence[NP_span[0]:NP_span[1] + 1]
     tmp_s = ''
     for w in NP_words:
@@ -216,17 +216,17 @@ with open('predicated_data.jsonlines', 'r') as f:
                 predicated_NP_features = list()
                 for NP in gold_NPs:
                     gold_NP_words.append(all_sentence[NP[0]:NP[1]+1])
-                    gold_NP_sentence_index.append(find_sentence_index(tmp_example, NP[:1]))
+                    gold_NP_sentence_index.append(find_sentence_index(tmp_example, NP[:2]))
                     if str(find_sentence_index(tmp_example, NP)-find_sentence_index(tmp_example, pronoun_span)) not in gold_NP_sentence_distance_dict:
                         gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] = 0
                     gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] += 1
                     gold_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1]+1]))
-                    gold_NP_features.append(get_feature_for_NP(tmp_example, NP[:1]))
+                    gold_NP_features.append(get_feature_for_NP(tmp_example, NP[:2]))
                 for NP in predicated_NPs:
                     predicated_NP_words.append(all_sentence[NP[0]:NP[1]+1])
-                    predicated_NP_index.append(find_sentence_index(tmp_example, NP[:1]))
+                    predicated_NP_index.append(find_sentence_index(tmp_example, NP[:2]))
                     predicated_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1] + 1]))
-                    predicated_NP_features.append(get_feature_for_NP(tmp_example, NP[:1]))
+                    predicated_NP_features.append(get_feature_for_NP(tmp_example, NP[:2]))
 
                 parsed_pronoun_example['related_words'] = related_words
                 parsed_pronoun_example['pronoun_sentence_index'] = pronoun_sentence_index
