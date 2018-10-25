@@ -456,7 +456,7 @@ for pronoun_type in all_pronouns_by_type:
 
 all_pronouns = set(all_pronouns)
 
-interested_pronouns = ['third_personal', 'neutral', 'demonstrative', 'possessive']
+interested_pronouns = ['third_personal', 'neutral', 'demonstrative']
 
 interested_entity_types = ['NATIONALITY', 'ORGANIZATION', 'PERSON', 'DATE', 'CAUSE_OF_DEATH', 'CITY', 'LOCATION',
                            'NUMBER', 'TITLE', 'TIME', 'ORDINAL', 'DURATION', 'MISC', 'COUNTRY', 'SET', 'PERCENT',

@@ -802,6 +802,7 @@ class CorefModel(object):
                         valid_NPs.append(NP)
                 print(pronoun_type, ':', len(valid_NPs))
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
+                    coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
                     tmp_predicated_pronoun_example = pronoun_example
                     tmp_predicated_pronoun_example['predicated_NPs'] = list()
                     # print(pronoun_example)
@@ -827,7 +828,7 @@ class CorefModel(object):
                             pronoun_position = i
                             break
                     # print(pronoun_position)
-                    coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
+
                     coreference_result_by_entity_type[most_entity_type]['all_coref'] += 1
                     if pronoun_position > 0:
                         # sorted_antecedents = top_antecedents[pronoun_position]
