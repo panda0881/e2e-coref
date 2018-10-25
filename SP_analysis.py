@@ -159,14 +159,14 @@ with open('predicated_data.jsonlines', 'r') as f:
                 predicated_NP_keywords = list()
                 for NP in gold_NPs:
                     gold_NP_words.append(all_sentence[NP[0]:NP[1]+1])
-                    gold_NP_sentence_index.append(find_sentence_index(tmp_example, NP))
+                    gold_NP_sentence_index.append(find_sentence_index(tmp_example, NP[:1]))
                     if str(find_sentence_index(tmp_example, NP)-find_sentence_index(tmp_example, pronoun_span)) not in gold_NP_sentence_distance_dict:
-                        gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP)-find_sentence_index(tmp_example, pronoun_span))] = 0
-                    gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP)-find_sentence_index(tmp_example, pronoun_span))] += 1
+                        gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] = 0
+                    gold_NP_sentence_distance_dict[str(find_sentence_index(tmp_example, NP[:1])-find_sentence_index(tmp_example, pronoun_span))] += 1
                     gold_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1]+1]))
                 for NP in predicated_NPs:
                     predicated_NP_words.append(all_sentence[NP[0]:NP[1]+1])
-                    predicated_NP_index.append(find_sentence_index(tmp_example, NP))
+                    predicated_NP_index.append(find_sentence_index(tmp_example, NP[:1]))
                     predicated_NP_keywords.append(detect_key_words(all_sentence[NP[0]:NP[1] + 1]))
                 parsed_pronoun_example['related_words'] = related_words
                 parsed_pronoun_example['pronoun_sentence_index'] = pronoun_sentence_index
