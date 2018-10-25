@@ -865,14 +865,14 @@ class CorefModel(object):
                             first_score = float(antecedence_to_score[str(valid_NP_positions[0])])
                             if first_score > 0:
                                 for tmp_valid_NP_position in valid_NP_positions:
-                                    if float(antecedence_to_score[str(tmp_valid_NP_position)]) > 0:
-                                        tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position])])
+                                    if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
+                                        tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position]), float(antecedence_to_score[str(tmp_valid_NP_position)])])
                                 if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
                                     break
                             else:
                                 for tmp_valid_NP_position in valid_NP_positions:
                                     if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
-                                        tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position])])
+                                        tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position]), float(antecedence_to_score[str(tmp_valid_NP_position)])])
                                 if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
                                     break
                     tmp_predicated_data[pronoun_type].append(tmp_predicated_pronoun_example)
