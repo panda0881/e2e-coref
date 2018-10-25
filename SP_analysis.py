@@ -124,11 +124,10 @@ def find_sentence_index(example, span):
 
 def get_feature_for_NP(example, NP_span):
     features = dict()
-    detected_entities = example['entities']
     tmp_all_sentence = list()
     for tmp_s in example['sentences']:
         tmp_all_sentence += tmp_s
-    NP_words = all_sentence[NP_span[0]:NP_span[1] + 1]
+    NP_words = tmp_all_sentence[NP_span[0]:NP_span[1] + 1]
     tmp_s = ''
     for w in NP_words:
         tmp_s += ' '
