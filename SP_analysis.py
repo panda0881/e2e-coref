@@ -287,10 +287,10 @@ with open('parsed_test_pronoun_example.jsonlines', 'r') as f:
 
 print(len(parsed_test_data))
 #
-# with open('parsed_test_pronoun_example.jsonlines', 'w') as f:
-#     for e in parsed_test_data:
-#         f.write(json.dumps(e))
-#         f.write('\n')
+with open('parsed_test_pronoun_example.jsonlines', 'w') as f:
+    for e in parsed_test_data:
+        f.write(json.dumps(e))
+        f.write('\n')
 # correct_scores = list()
 # wrong_scores = list()
 # #
