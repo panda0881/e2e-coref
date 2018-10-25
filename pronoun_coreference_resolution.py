@@ -28,7 +28,9 @@ if __name__ == "__main__":
 
     with open('selected_example.json', 'r') as f:
         selected_example = json.load(f)
-
+    pronoun_count = dict()
+    for pronoun_type in interested_pronouns:
+        pronoun_count[pronoun_type] = 0
     with open('test.english.jsonlines', 'r') as f:
         counter = 0
         for line in f:
@@ -58,37 +60,40 @@ if __name__ == "__main__":
                     if len(c[i][1]) == 1 and c[i][1][0] in all_pronouns:
                         for pronoun_type in interested_pronouns:
                             if c[i][1][0] in all_pronouns_by_type[pronoun_type]:
+
                                 potential_NPs = list()
                                 for j in range(len(c)):
                                     if len(c[j][1]) != 1 or c[j][1][0] not in all_pronouns:
                                         potential_NPs.append(c[j][0])
                                 if len(potential_NPs) > 0:
+                                    pronoun_count[pronoun_type] += 1
                                     Pronoun_dict[pronoun_type].append({'pronoun': c[i][0], 'NPs': potential_NPs})
                     else:
                         tmp_all_NPs.append(c[i][0])
             tmp_example['pronoun_coreference_info'] = {'all_NP': tmp_all_NPs, 'pronoun_dict': Pronoun_dict}
             test_data.append(tmp_example)
     print('finish processing data')
+    print(pronoun_count)
 
 
-    config = util.initialize_from_env()
-    model = cm.CorefModel(config)
-
-    with tf.Session() as session:
-        model.restore(session)
-
-        # print('we are working on NP-NP')
-        # data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=5, rank=False)
-
-        predicated_data = model.evaluate_pronoun_coreference(session, test_data)
-        # with open('failed_cases.jsonlines', 'w') as f:
-        #     for e in data_for_analysis:
-        #         f.write(json.dumps(e))
-        #         f.write('\n')
-        with open('predicated_data.jsonlines', 'w') as f:
-            for e in predicated_data:
-                f.write(json.dumps(e))
-                f.write('\n')
+    # config = util.initialize_from_env()
+    # model = cm.CorefModel(config)
+    #
+    # with tf.Session() as session:
+    #     model.restore(session)
+    #
+    #     # print('we are working on NP-NP')
+    #     # data_for_analysis = model.evaluate_pronoun_coreference_with_filter(session, test_data, filter_span=5, rank=False)
+    #
+    #     predicated_data = model.evaluate_pronoun_coreference(session, test_data)
+    #     # with open('failed_cases.jsonlines', 'w') as f:
+    #     #     for e in data_for_analysis:
+    #     #         f.write(json.dumps(e))
+    #     #         f.write('\n')
+    #     with open('predicated_data.jsonlines', 'w') as f:
+    #         for e in predicated_data:
+    #             f.write(json.dumps(e))
+    #             f.write('\n')
 
 # print(all_count)
 
