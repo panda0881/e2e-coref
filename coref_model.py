@@ -779,7 +779,7 @@ class CorefModel(object):
             tmp_entity_dict = dict()
             for detected_entity in example['entities']:
                 tmp_entity_dict[str(detected_entity[0][0]) + '_' + str(detected_entity[0][1])] = detected_entity[1]
-            print('number of all NP:', len(all_NPs))
+            # print('number of all NP:', len(all_NPs))
             for pronoun_type in interested_pronouns:
                 tmp_predicated_data[pronoun_type] = list()
                 valid_NPs = list()
@@ -800,10 +800,10 @@ class CorefModel(object):
                 else:
                     for NP in all_NPs:
                         valid_NPs.append(NP)
-                print(pronoun_type, ':', len(valid_NPs))
-                print('number of examples', pronoun_type, len(example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]))
+                # print(pronoun_type, ':', len(valid_NPs))
+                # print('number of examples', pronoun_type, len(example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]))
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
-                    print(pronoun_type, 'found one')
+                    # print(pronoun_type, 'found one')
                     coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
                     tmp_predicated_pronoun_example = pronoun_example
                     tmp_predicated_pronoun_example['predicated_NPs'] = list()
@@ -870,14 +870,14 @@ class CorefModel(object):
                                 for tmp_valid_NP_position in valid_NP_positions:
                                     if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
                                         tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position]), float(antecedence_to_score[str(tmp_valid_NP_position)])])
-                                if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
-                                    break
+                                    if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
+                                        break
                             else:
                                 for tmp_valid_NP_position in valid_NP_positions:
                                     if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
                                         tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position]), float(antecedence_to_score[str(tmp_valid_NP_position)])])
-                                if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
-                                    break
+                                    if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
+                                        break
                     tmp_predicated_data[pronoun_type].append(tmp_predicated_pronoun_example)
             print('length of collected example for analysis:', len(tmp_data_for_analysis))
             data_for_analysis.append(tmp_data_for_analysis)
