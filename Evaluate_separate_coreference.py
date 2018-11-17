@@ -100,10 +100,10 @@ if __name__ == "__main__":
                             # print('lalala')
                     if find_pronoun:
                         for mention in coref_cluster:
-                            if verify_correct_NP_match(mention, pronoun_example['candidate_NPs'], 'cover'):
+                            if verify_correct_NP_match(mention, pronoun_example['candidate_NPs'], 'exact'):
                                 predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
-                                if verify_correct_NP_match(mention, pronoun_example['correct_NPs'], 'cover'):
+                                if verify_correct_NP_match(mention, pronoun_example['correct_NPs'], 'exact'):
                                     correct_predict_coreference += 1
                                     result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
                 all_coreference += len(pronoun_example['correct_NPs'])
