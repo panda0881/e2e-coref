@@ -78,7 +78,9 @@ if __name__ == "__main__":
         model.restore(session)
 
         # print('we are working on NP-NP')
+        counter = 0
         for tmp_example in tqdm(test_data):
+            counter += 1
             predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
 
             all_sentence = list()
@@ -106,6 +108,14 @@ if __name__ == "__main__":
                                     result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
                 all_coreference += len(pronoun_example['correct_NPs'])
                 result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(pronoun_example['correct_NPs'])
+            if counter % 10 == 0:
+                p = correct_predict_coreference / predict_coreference
+                r = correct_predict_coreference / all_coreference
+                f1 = 2 * p * r / (p + r)
+                print("Average F1 (py): {:.2f}%".format(f1 * 100))
+                print("Average precision (py): {:.2f}%".format(p * 100))
+                print("Average recall (py): {:.2f}%".format(r * 100))
+                print('end')
         # model.evaluate_external_data(session, test_data, official_stdout=True)
 
 
