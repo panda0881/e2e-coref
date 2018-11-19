@@ -537,7 +537,7 @@ with open('OMCS/new_omcs600.txt', 'r', encoding='utf-8') as f:
 
 
 third_personal_pronouns = ['she', 'her', 'he', 'him', 'them', 'they', 'She', 'Her', 'He', 'Him', 'Them',
-                           'They']
+                           'They', 'it', 'It']
 
 neutral_pronoun = ['it', 'It']
 
@@ -576,7 +576,7 @@ for pronoun_type in all_pronouns_by_type:
 
 all_pronouns = set(all_pronouns)
 
-interested_pronouns = ['third_personal', 'neutral', 'possessive']
+interested_pronouns = ['third_personal', 'possessive']
 
 interested_entity_types = ['NATIONALITY', 'ORGANIZATION', 'PERSON', 'DATE', 'CAUSE_OF_DEATH', 'CITY', 'LOCATION',
                            'NUMBER', 'TITLE', 'TIME', 'ORDINAL', 'DURATION', 'MISC', 'COUNTRY', 'SET', 'PERCENT',
