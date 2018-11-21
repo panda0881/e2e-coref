@@ -47,6 +47,8 @@ if __name__ == "__main__":
         # print('we are working on NP-NP')
         counter = 0
         for example_num, tmp_example in enumerate(test_data):
+            if example_num != 54:
+                continue
             counter += 1
             predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
 
