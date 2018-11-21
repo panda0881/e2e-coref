@@ -81,7 +81,7 @@ if __name__ == "__main__":
         counter = 0
         for tmp_example in tqdm(test_data):
             counter += 1
-            predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
+            # predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
 
             all_sentence = list()
             for s in tmp_example['sentences']:
