@@ -62,6 +62,7 @@ if __name__ == "__main__":
                 tmp_predict = 0
                 tmp_correct_predict = 0
                 tmp_all = 0
+                print(predicted_cluster)
                 for coref_cluster in predicted_cluster:
                     find_pronoun = False
                     for mention in coref_cluster:
@@ -75,7 +76,7 @@ if __name__ == "__main__":
                         for mention in coref_cluster:
                             if verify_correct_NP_match(mention, pronoun_example['candidate_NPs'], 'exact'):
                                 tmp_predict += 1
-                                print(mention)
+                                # print(mention)
                                 if verify_correct_NP_match(mention, pronoun_example['correct_NPs'], 'exact'):
                                     tmp_correct_predict += 1
                 tmp_all += len(pronoun_example['correct_NPs'])
