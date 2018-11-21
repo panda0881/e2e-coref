@@ -87,7 +87,7 @@ if __name__ == "__main__":
                 if not good_example:
                     stored_case.append((example_num, i))
     print(len(stored_case))
-    with open('interested_examples.json', 'w') as f:
-        json.dump(stored_case, f)
+    # with open('interested_examples.json', 'w') as f:
+    #     json.dump(stored_case, f)
 
 
