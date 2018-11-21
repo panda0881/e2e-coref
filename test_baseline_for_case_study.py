@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
         # print('we are working on NP-NP')
         counter = 0
-        for example_num, tmp_example in tqdm(enumerate(test_data)):
+        for example_num, tmp_example in enumerate(test_data):
             counter += 1
             predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
             for s in tmp_example['sentences']:
                 all_sentence += s
             for i, pronoun_example in enumerate(tmp_example['pronoun_info']):
-                if [example_num, i] not in selected_cases:
+                if [example_num, i] not in [[54, 6]]:
                     continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
@@ -75,6 +75,7 @@ if __name__ == "__main__":
                         for mention in coref_cluster:
                             if verify_correct_NP_match(mention, pronoun_example['candidate_NPs'], 'exact'):
                                 tmp_predict += 1
+                                print(mention)
                                 if verify_correct_NP_match(mention, pronoun_example['correct_NPs'], 'exact'):
                                     tmp_correct_predict += 1
                 tmp_all += len(pronoun_example['correct_NPs'])
