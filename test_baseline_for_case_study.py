@@ -47,8 +47,8 @@ if __name__ == "__main__":
         # print('we are working on NP-NP')
         counter = 0
         for example_num, tmp_example in enumerate(test_data):
-            if example_num != 54:
-                continue
+            # if example_num != 54:
+            #     continue
             counter += 1
             predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
 
@@ -56,8 +56,8 @@ if __name__ == "__main__":
             for s in tmp_example['sentences']:
                 all_sentence += s
             for i, pronoun_example in enumerate(tmp_example['pronoun_info']):
-                if [example_num, i] not in [[54, 6]]:
-                    continue
+                # if [example_num, i] not in [[54, 6]]:
+                #     continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
                 good_example = False
