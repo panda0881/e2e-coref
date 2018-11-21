@@ -56,15 +56,15 @@ if __name__ == "__main__":
             for s in tmp_example['sentences']:
                 all_sentence += s
             for i, pronoun_example in enumerate(tmp_example['pronoun_info']):
-                # if [example_num, i] not in [[54, 6]]:
-                #     continue
+                if [example_num, i] not in selected_cases:
+                    continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
                 good_example = False
                 tmp_predict = 0
                 tmp_correct_predict = 0
                 tmp_all = 0
-                print(predicted_cluster)
+                # print(predicted_cluster)
                 for coref_cluster in predicted_cluster:
                     find_pronoun = False
                     for mention in coref_cluster:
