@@ -415,8 +415,9 @@ class CorefModel(object):
         # top_span_indices.set_shape([1, None])
         # top_span_indices = tf.squeeze(top_span_indices, 0)  # [k]
         golden_mask = tf.greater(candidate_mention_scores, tf.zeros([util.shape(candidate_mention_scores, 0)]))
-        top_span_indices = tf.squeeze(tf.where(golden_mask))
+        top_span_indices = tf.where(golden_mask)
         k = util.shape(top_span_indices, 0)
+        top_span_indices = tf.reshape(top_span_indices, [k])
 
         top_span_starts = tf.gather(candidate_starts, top_span_indices)  # [k]
         top_span_ends = tf.gather(candidate_ends, top_span_indices)  # [k]
