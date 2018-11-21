@@ -89,6 +89,12 @@ if __name__ == "__main__":
             for pronoun_example in tmp_example['pronoun_info']:
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
+                tmp_candidates = list()
+                tmp_candidates.append(tuple(pronoun_example['current_pronoun']))
+                for np in pronoun_example['candidate_NPs']:
+                    tmp_candidates.append(tuple(np))
+                tmp_example['all_candidates'] = tmp_candidates
+                predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
                 for coref_cluster in predicted_cluster:
                     find_pronoun = False
                     for mention in coref_cluster:

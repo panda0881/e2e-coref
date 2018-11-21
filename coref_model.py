@@ -126,28 +126,8 @@ class CorefModel(object):
 
     def tensorize_pronoun_example(self, example, is_training):
         clusters = example["clusters"]
-        all_NPs = list()
-        for conll_NP in example['pronoun_coreference_info']['all_NP']:
-            if conll_NP not in all_NPs:
-                all_NPs.append(conll_NP)
-        # parsed_NPs = list()
-        # for tmp_NP in example['all_NP']:
-        #     found_overlap_NP = False
-        #     for NP in all_NPs:
-        #         if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
-        #             found_overlap_NP = True
-        #             break
-        #         if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
-        #             found_overlap_NP = True
-        #             break
-        #     if not found_overlap_NP:
-        #         parsed_NPs.append(tmp_NP)
-        # all_NPs += parsed_NPs
-        tmp_gold_mentions = [tuple(m) for m in util.flatten(clusters)]
-        for tmp_NP in all_NPs:
-            if tuple(tmp_NP) not in tmp_gold_mentions:
-                tmp_gold_mentions.append(tuple(tmp_NP))
-        gold_mentions = sorted(tmp_gold_mentions)
+
+        gold_mentions = sorted(example['all_candidates'])
         gold_mention_map = {m: i for i, m in enumerate(gold_mentions)}
         cluster_ids = np.zeros(len(gold_mentions))
         for cluster_id, cluster in enumerate(clusters):
@@ -189,7 +169,10 @@ class CorefModel(object):
             tokens, context_word_emb, head_word_emb, lm_emb, char_index, text_len, speaker_ids, genre, is_training,
             gold_starts, gold_ends, cluster_ids)
 
-        return example_tensors
+        if is_training and len(sentences) > self.config["max_training_sentences"]:
+            return self.truncate_example(*example_tensors)
+        else:
+            return example_tensors
 
     def tensorize_example(self, example, is_training):
         clusters = example["clusters"]
@@ -735,7 +718,7 @@ class CorefModel(object):
         return util.make_summary(summary_dict), average_f1
 
     def predict_cluster_for_one_example(self, session, tmp_exmaple):
-        tensorized_example = self.tensorize_example(tmp_exmaple, is_training=False)
+        tensorized_example = self.tensorize_pronoun_example(tmp_exmaple, is_training=False)
         _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
         feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
         candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(
