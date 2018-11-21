@@ -719,7 +719,7 @@ class CorefModel(object):
         return util.make_summary(summary_dict), average_f1
 
     def predict_cluster_for_one_example(self, session, tmp_exmaple):
-        tensorized_example = self.tensorize_pronoun_example(tmp_exmaple, is_training=False)
+        tensorized_example = self.tensorize_example(tmp_exmaple, is_training=False)
         _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
         feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
         candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(

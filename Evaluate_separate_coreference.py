@@ -81,7 +81,7 @@ if __name__ == "__main__":
         counter = 0
         for tmp_example in tqdm(test_data):
             counter += 1
-            # predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
+            predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
 
             all_sentence = list()
             for s in tmp_example['sentences']:
@@ -94,7 +94,7 @@ if __name__ == "__main__":
                 for np in pronoun_example['candidate_NPs']:
                     tmp_candidates.append(tuple(np))
                 tmp_example['all_candidates'] = tmp_candidates
-                predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
+                # predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
                 for coref_cluster in predicted_cluster:
                     find_pronoun = False
                     for mention in coref_cluster:
