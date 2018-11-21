@@ -47,7 +47,7 @@ if __name__ == "__main__":
         # print('we are working on NP-NP')
         counter = 0
         for example_num, tmp_example in tqdm(enumerate(test_data)):
-            if example_num != 308:
+            if example_num not in  [220, 262, 298, 308]:
                 continue
             counter += 1
             predicted_cluster = model.predict_cluster_for_one_example(session, tmp_example)
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             for s in tmp_example['sentences']:
                 all_sentence += s
             for i, pronoun_example in enumerate(tmp_example['pronoun_info']):
-                if [example_num, i] not in [[308, 20]]:
+                if [example_num, i] not in [[220, 2], [262, 19], [298, 14], [308, 20]]:
                     continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
