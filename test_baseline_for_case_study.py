@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
         # print('we are working on NP-NP')
         counter = 0
-        for example_num, tmp_example in enumerate(test_data):
+        for example_num, tmp_example in tqdm(enumerate(test_data)):
             # if example_num != 54:
             #     continue
             counter += 1
