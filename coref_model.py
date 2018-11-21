@@ -132,7 +132,8 @@ class CorefModel(object):
         cluster_ids = np.zeros(len(gold_mentions))
         for cluster_id, cluster in enumerate(clusters):
             for mention in cluster:
-                cluster_ids[gold_mention_map[tuple(mention)]] = cluster_id + 1
+                if mention in gold_mention_map:
+                    cluster_ids[gold_mention_map[tuple(mention)]] = cluster_id + 1
 
         sentences = example["sentences"]
         num_words = sum(len(s) for s in sentences)
