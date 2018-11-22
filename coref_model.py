@@ -763,7 +763,7 @@ class CorefModel(object):
             for s in example['sentences']:
                 all_sentence += s
 
-            for pronoun_example in example['pronoun_coreference_info']:
+            for pronoun_example in example['pronoun_info']:
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
 
