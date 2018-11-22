@@ -387,7 +387,7 @@ class CorefModel(object):
         # candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
 
         candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts,
-                                                                  gold_ends) # [num_candidates]
+                                                                  gold_ends)  # [num_candidates]
 
         # k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
         # top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
@@ -503,7 +503,7 @@ class CorefModel(object):
         same_end = tf.equal(tf.expand_dims(gold_ends, 1),
                             tf.expand_dims(candidate_ends, 0))  # [num_labeled, num_candidates]
         same_span = tf.logical_and(same_start, same_end)  # [num_labeled, num_candidates]
-        return tf.reduce_sum(tf.cast(same_span, tf.float32), 0) #[num_candidates]
+        return tf.reduce_sum(tf.cast(same_span, tf.float32), 0)  # [num_candidates]
 
         # return candidate_labels
         # gold_mention_pairs = list()
@@ -731,6 +731,7 @@ class CorefModel(object):
 
     def evaluate_pronoun_coreference(self, session, evaluation_data):
         data_for_analysis = list()
+
         # setting up
         def load_data_by_line(example):
             return self.tensorize_pronoun_example(example, is_training=False), example
@@ -738,13 +739,13 @@ class CorefModel(object):
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
         print("Loaded {} eval examples.".format(len(self.eval_data)))
-        coreference_result_by_pronoun = dict()
-        for pronoun_type in interested_pronouns:
-            coreference_result_by_pronoun[pronoun_type] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
-        coreference_result_by_entity_type = dict()
-        for entity_type in interested_entity_types:
-            coreference_result_by_entity_type[entity_type] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
-        coreference_result_by_entity_type['Others'] = {'correct_coref': 0, 'all_coref': 0, 'accuracy': 0.0}
+        all_coreference = 0
+        predict_coreference = 0
+        correct_predict_coreference = 0
+        result_by_pronoun_type = dict()
+        for tmp_pronoun_type in interested_pronouns:
+            result_by_pronoun_type[tmp_pronoun_type] = {'all_coreference': 0, 'predict_coreference': 0,
+                                                        'correct_predict_coreference': 0}
 
         # start to predict
         predicated_data = list()
@@ -757,160 +758,73 @@ class CorefModel(object):
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
             predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
-            all_NPs = list()
-            for conll_NP in example['pronoun_coreference_info']['all_NP']:
-                if conll_NP not in all_NPs:
-                    all_NPs.append(conll_NP)
-            print('Number of gold NP:', len(all_NPs))
-            # parsed_NPs = list()
-            # for tmp_NP in example['all_NP']:
-            #     found_overlap_NP = False
-            #     for NP in all_NPs:
-            #         if tmp_NP[0] <= NP[0] and tmp_NP[1] >= NP[1]:
-            #             found_overlap_NP = True
-            #             break
-            #         if tmp_NP[0] >= NP[0] and tmp_NP[1] <= NP[1]:
-            #             found_overlap_NP = True
-            #             break
-            #     if not found_overlap_NP:
-            #         parsed_NPs.append(tmp_NP)
-            # all_NPs += parsed_NPs
-            tmp_entity_dict = dict()
-            for detected_entity in example['entities']:
-                tmp_entity_dict[str(detected_entity[0][0]) + '_' + str(detected_entity[0][1])] = detected_entity[1]
             # print('number of all NP:', len(all_NPs))
-            for pronoun_type in interested_pronouns:
-                tmp_predicated_data[pronoun_type] = list()
-                valid_NPs = list()
-                if pronoun_type == 'third_personal':
-                    for NP in all_NPs:
-                        if str(NP[0]) + '_' + str(NP[1]) not in tmp_entity_dict:
-                            valid_NPs.append(NP)
-                        else:
-                            if tmp_entity_dict[str(NP[0]) + '_' + str(NP[1])] == 'PERSON':
-                                valid_NPs.append(NP)
-                elif pronoun_type == 'neutral':
-                    for NP in all_NPs:
-                        if str(NP[0]) + '_' + str(NP[1]) not in tmp_entity_dict:
-                            valid_NPs.append(NP)
-                        else:
-                            if tmp_entity_dict[str(NP[0]) + '_' + str(NP[1])] != 'PERSON':
-                                valid_NPs.append(NP)
-                else:
-                    for NP in all_NPs:
-                        valid_NPs.append(NP)
-                # print(pronoun_type, ':', len(valid_NPs))
-                # print('number of examples', pronoun_type, len(example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]))
-                for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
-                    valid_NPs = pronoun_example['candidate_NPs']
-                    tmp_predicated_pronoun_example = pronoun_example
-                    tmp_predicated_pronoun_example['predicated_NPs'] = list()
-                    # print(pronoun_example)
-                    pronoun_span = pronoun_example['pronoun']
-                    correct_NPs = pronoun_example['NPs']
-                    # detect entity_type
-                    tmp_entity_type_match_dict = dict()
-                    for NP_span in correct_NPs:
-                        for detected_entity in example['entities']:
-                            if NP_span[0] == detected_entity[0][0] and NP_span[1] == detected_entity[0][1]:
-                                if detected_entity[0][1] not in tmp_entity_type_match_dict:
-                                    tmp_entity_type_match_dict[detected_entity[1]] = 0
-                                tmp_entity_type_match_dict[detected_entity[1]] += 1
-                    if len(tmp_entity_type_match_dict) == 0:
-                        most_entity_type = 'Others'
-                    else:
-                        sorted_entity_type = sorted(tmp_entity_type_match_dict, key= lambda x: tmp_entity_type_match_dict[x])
-                        most_entity_type = sorted_entity_type[0]
+            all_sentence = list()
+            for s in example['sentences']:
+                all_sentence += s
 
-                    pronoun_position = -1
-                    for i in range(top_span_starts.shape[0]):
-                        if top_span_starts[i] == pronoun_span[0] and top_span_ends[i] == pronoun_span[1]:
-                            pronoun_position = i
-                            break
-                    # print(pronoun_position)
-                    coreference_result_by_pronoun[pronoun_type]['all_coref'] += 1
-                    coreference_result_by_entity_type[most_entity_type]['all_coref'] += 1
-                    if pronoun_position > 0:
-                        # sorted_antecedents = top_antecedents[pronoun_position]
-                        antecedence_to_score = dict()
-                        for i in range(len(top_antecedents[pronoun_position])):
-                            antecedence_to_score[str(top_antecedents[pronoun_position][i])] = \
-                                top_antecedent_scores[pronoun_position][i + 1]
-                        sorted_antecedents = sorted(antecedence_to_score, key=lambda x: antecedence_to_score[x],
-                                                    reverse=True)
-                        for i in range(len(sorted_antecedents)):
-                            tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
-                                if verify_correct_NP_match(
-                                        [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], correct_NPs,
-                                        'exact'):
-                                    coreference_result_by_pronoun[pronoun_type]['correct_coref'] += 1
-                                    coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
-                                else:
-                                    tmp_data_for_analysis.append((pronoun_type, pronoun_example))
-                                coreference_result_by_pronoun[pronoun_type]['accuracy'] = \
-                                coreference_result_by_pronoun[pronoun_type]['correct_coref'] / \
-                                coreference_result_by_pronoun[pronoun_type]['all_coref']
+            for pronoun_example in example['pronoun_coreference_info']:
+                tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
+                current_pronoun_type = get_pronoun_type(tmp_pronoun)
 
+                pronoun_position = -1
+                for i in range(top_span_starts.shape[0]):
+                    if top_span_starts[i] == pronoun_example['current_pronoun'][0] and top_span_ends[i] == pronoun_example['current_pronoun'][1]:
+                        pronoun_position = i
+                        break
+                # print(pronoun_position)
+                result_by_pronoun_type[current_pronoun_type]['all_coref'] += 1
+                if pronoun_position > 0:
+                    # sorted_antecedents = top_antecedents[pronoun_position]
+                    antecedence_to_score = dict()
+                    for i in range(len(top_antecedents[pronoun_position])):
+                        antecedence_to_score[str(top_antecedents[pronoun_position][i])] = \
+                            top_antecedent_scores[pronoun_position][i + 1]
+                    sorted_antecedents = sorted(antecedence_to_score, key=lambda x: antecedence_to_score[x],
+                                                reverse=True)
+                    for i in range(len(sorted_antecedents)):
+                        tmp_NP_position = int(sorted_antecedents[i])
+                        if antecedence_to_score[sorted_antecedents[i]]> 0 and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in pronoun_example['candidate_NPs']:
+                            predict_coreference += 1
+                            result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
+                            if verify_correct_NP_match(
+                                    [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['correct_NPs'],
+                                    'exact'):
+                                correct_predict_coreference += 1
+                                result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
+                    all_coreference += len(pronoun_example['correct_NPs'])
+                    result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
+                        pronoun_example['correct_NPs'])
+            if example_num % 10 == 0:
+                p = correct_predict_coreference / predict_coreference
+                r = correct_predict_coreference / all_coreference
+                f1 = 2 * p * r / (p + r)
+                print("Average F1 (py): {:.2f}%".format(f1 * 100))
+                print("Average precision (py): {:.2f}%".format(p * 100))
+                print("Average recall (py): {:.2f}%".format(r * 100))
+                print('end')
 
-                                coreference_result_by_entity_type[most_entity_type]['accuracy'] = \
-                                    coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
-                                    coreference_result_by_entity_type[most_entity_type]['all_coref']
-                                break
-                        valid_NP_positions = list()
-                        for i in range(len(sorted_antecedents)):
-                            tmp_NP_position = int(sorted_antecedents[i])
-                            if [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in valid_NPs:
-                                valid_NP_positions.append(tmp_NP_position)
-                        if len(valid_NP_positions) > 0:
-                            for tmp_valid_NP_position in valid_NP_positions:
-                                if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
-                                    tmp_predicated_pronoun_example['predicated_NPs'].append(
-                                        [int(top_span_starts[tmp_valid_NP_position]),
-                                         int(top_span_ends[tmp_valid_NP_position]),
-                                         float(antecedence_to_score[str(tmp_valid_NP_position)])])
-                            # first_score = float(antecedence_to_score[str(valid_NP_positions[0])])
-                            # if first_score > 0:
-                            #     for tmp_valid_NP_position in valid_NP_positions:
-                            #         if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
-                            #             tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position]), float(antecedence_to_score[str(tmp_valid_NP_position)])])
-                            #         if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
-                            #             break
-                            # else:
-                            #     for tmp_valid_NP_position in valid_NP_positions:
-                            #         if float(antecedence_to_score[str(tmp_valid_NP_position)]) > -10:
-                            #             tmp_predicated_pronoun_example['predicated_NPs'].append([int(top_span_starts[tmp_valid_NP_position]), int(top_span_ends[tmp_valid_NP_position]), float(antecedence_to_score[str(tmp_valid_NP_position)])])
-                            #         if len(tmp_predicated_pronoun_example['predicated_NPs']) >= 5:
-                            #             break
-                    tmp_predicated_data[pronoun_type].append(tmp_predicated_pronoun_example)
-            print('length of collected example for analysis:', len(tmp_data_for_analysis))
-            data_for_analysis.append(tmp_data_for_analysis)
-            predicated_data.append(tmp_predicated_data)
-
-            # print('top_span_starts:', top_span_starts)
-            # print('shape:', top_span_starts.shape)
-            # print('top_span_ends:', top_span_ends)
-            # print('shape:', top_span_ends.shape)
-            # print('top_antecedents', top_antecedents)
-            # print('shape:', top_antecedents.shape)
-            # print('top_antecedent_scores:', top_antecedent_scores)
-            # print('shape:', top_antecedent_scores.shape)
-            # print('predicated_antecedents:', predicted_antecedents)
-            # print('tmp_data', example['pronoun_coreference_info'])
-            print('Result until example:', example_num, '/', len(self.eval_data))
-            print(coreference_result_by_pronoun)
-            # print(coreference_result_by_entity_type)
-            # break
-        all_pronoun_correct_number = 0
-        all_pronoun_numebr = 0
-        for pronoun_type in coreference_result_by_pronoun:
-            all_pronoun_correct_number += coreference_result_by_pronoun[pronoun_type]['correct_coref']
-            all_pronoun_numebr += coreference_result_by_pronoun[pronoun_type]['all_coref']
-        print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number / all_pronoun_numebr)
-        return predicated_data
+        for tmp_pronoun_type in interested_pronouns:
+            print('Pronoun type:', tmp_pronoun_type)
+            tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                    result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
+            tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                    result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
+            tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
+            print('p:', tmp_p)
+            print('r:', tmp_r)
+            print('f1:', tmp_f1)
+        p = correct_predict_coreference / predict_coreference
+        r = correct_predict_coreference / all_coreference
+        f1 = 2 * p * r / (p + r)
+        print("Average F1 (py): {:.2f}%".format(f1 * 100))
+        print("Average precision (py): {:.2f}%".format(p * 100))
+        print("Average recall (py): {:.2f}%".format(r * 100))
+        print('end')
 
     def evaluate_pronoun_coreference_with_filter(self, session, evaluation_data, filter_span=2, rank=False):
         data_for_analysis = list()
+
         # setting up
         def load_data_by_line(example):
             return self.tensorize_pronoun_example(example, is_training=False), example
@@ -931,7 +845,6 @@ class CorefModel(object):
         wrong_scores = list()
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
 
-
             tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
             feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
@@ -960,29 +873,27 @@ class CorefModel(object):
 
             tmp_entity_dict = dict()
             for detected_entity in example['entities']:
-                tmp_entity_dict[str(detected_entity[0][0])+'_'+str(detected_entity[0][1])] = detected_entity[1]
+                tmp_entity_dict[str(detected_entity[0][0]) + '_' + str(detected_entity[0][1])] = detected_entity[1]
 
             for pronoun_type in interested_pronouns:
                 valid_NPs = list()
                 if pronoun_type == 'third_personal':
                     for NP in all_NPs:
-                        if str(NP[0])+'_'+str(NP[1]) not in tmp_entity_dict:
+                        if str(NP[0]) + '_' + str(NP[1]) not in tmp_entity_dict:
                             valid_NPs.append(NP)
                         else:
-                            if tmp_entity_dict[str(NP[0])+'_'+str(NP[1])] == 'PERSON':
+                            if tmp_entity_dict[str(NP[0]) + '_' + str(NP[1])] == 'PERSON':
                                 valid_NPs.append(NP)
                 elif pronoun_type == 'neutral':
                     for NP in all_NPs:
-                        if str(NP[0])+'_'+str(NP[1]) not in tmp_entity_dict:
+                        if str(NP[0]) + '_' + str(NP[1]) not in tmp_entity_dict:
                             valid_NPs.append(NP)
                         else:
-                            if tmp_entity_dict[str(NP[0])+'_'+str(NP[1])] != 'PERSON':
+                            if tmp_entity_dict[str(NP[0]) + '_' + str(NP[1])] != 'PERSON':
                                 valid_NPs.append(NP)
                 else:
                     for NP in all_NPs:
                         valid_NPs.append(NP)
-
-
 
                 for pronoun_example in example['pronoun_coreference_info']['pronoun_dict'][pronoun_type]:
                     # print(pronoun_example)
@@ -999,7 +910,8 @@ class CorefModel(object):
                     if len(tmp_entity_type_match_dict) == 0:
                         most_entity_type = 'Others'
                     else:
-                        sorted_entity_type = sorted(tmp_entity_type_match_dict, key= lambda x: tmp_entity_type_match_dict[x])
+                        sorted_entity_type = sorted(tmp_entity_type_match_dict,
+                                                    key=lambda x: tmp_entity_type_match_dict[x])
                         most_entity_type = sorted_entity_type[0]
 
                     pronoun_position = -1
@@ -1028,7 +940,8 @@ class CorefModel(object):
                         found_match = False
                         NP_match_scores = list()
                         if rank:
-                            top_NPs, NP_match_scores = post_ranking(example, [top_span_starts[pronoun_position], top_span_ends[pronoun_position]], top_NPs)
+                            top_NPs, NP_match_scores = post_ranking(example, [top_span_starts[pronoun_position],
+                                                                              top_span_ends[pronoun_position]], top_NPs)
                         for i, tmp_NP in enumerate(top_NPs):
                             if verify_correct_NP_match(tmp_NP, correct_NPs, 'exact'):
                                 print('correct position:', i)
@@ -1043,13 +956,12 @@ class CorefModel(object):
                             coreference_result_by_entity_type[most_entity_type]['correct_coref'] += 1
 
                         coreference_result_by_pronoun[pronoun_type]['accuracy'] = \
-                                coreference_result_by_pronoun[pronoun_type]['correct_coref'] / \
-                                coreference_result_by_pronoun[pronoun_type]['all_coref']
-
+                            coreference_result_by_pronoun[pronoun_type]['correct_coref'] / \
+                            coreference_result_by_pronoun[pronoun_type]['all_coref']
 
                         coreference_result_by_entity_type[most_entity_type]['accuracy'] = \
-                                    coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
-                                    coreference_result_by_entity_type[most_entity_type]['all_coref']
+                            coreference_result_by_entity_type[most_entity_type]['correct_coref'] / \
+                            coreference_result_by_entity_type[most_entity_type]['all_coref']
 
             # print('length of collected example for analysis:', len(tmp_data_for_analysis))
             # data_for_analysis.append(tmp_data_for_analysis)
@@ -1074,7 +986,7 @@ class CorefModel(object):
         for pronoun_type in coreference_result_by_pronoun:
             all_pronoun_correct_number += coreference_result_by_pronoun[pronoun_type]['correct_coref']
             all_pronoun_numebr += coreference_result_by_pronoun[pronoun_type]['all_coref']
-        print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number/all_pronoun_numebr)
+        print(all_pronoun_correct_number, all_pronoun_numebr, all_pronoun_correct_number / all_pronoun_numebr)
         return data_for_analysis
 
     def separate_clusters(self, top_span_starts, top_span_ends, predicted_antecedents, example):
