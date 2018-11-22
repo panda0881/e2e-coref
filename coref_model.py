@@ -750,7 +750,7 @@ class CorefModel(object):
         # start to predict
         predicated_data = list()
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
-            if example_num != 262:
+            if example_num not in [262]:
                 continue
             tmp_predicated_data = dict()
             tmp_data_for_analysis = list()
@@ -765,8 +765,8 @@ class CorefModel(object):
             for s in example['sentences']:
                 all_sentence += s
 
-            for pronoun_example in example['pronoun_info']:
-                if pronoun_example != 19:
+            for i, pronoun_example in enumerate(example['pronoun_info']):
+                if i not in [19]:
                     continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
