@@ -734,7 +734,7 @@ class CorefModel(object):
 
         # setting up
         def load_data_by_line(example):
-            return self.tensorize_pronoun_example(example, is_training=False), example
+            return self.tensorize_example(example, is_training=False), example
 
         self.eval_data = [load_data_by_line(e) for e in evaluation_data]
         num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
