@@ -784,7 +784,7 @@ class CorefModel(object):
                     # print(antecedence_to_score)
                     for i in range(len(sorted_antecedents)):
                         tmp_NP_position = int(sorted_antecedents[i])
-                        if antecedence_to_score[sorted_antecedents[i]] > 5 and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in pronoun_example['candidate_NPs']:
+                        if antecedence_to_score[sorted_antecedents[i]] > 3 and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in pronoun_example['candidate_NPs']:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
                             if verify_correct_NP_match(
@@ -792,17 +792,17 @@ class CorefModel(object):
                                     'exact'):
                                 correct_predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
-                    all_coreference += len(pronoun_example['correct_NPs'])
-                    result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
+                all_coreference += len(pronoun_example['correct_NPs'])
+                result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                         pronoun_example['correct_NPs'])
             if (example_num+1) % 10 == 0:
+                print(example_num)
                 p = correct_predict_coreference / predict_coreference
                 r = correct_predict_coreference / all_coreference
                 f1 = 2 * p * r / (p + r)
                 print("Average F1 (py): {:.2f}%".format(f1 * 100))
                 print("Average precision (py): {:.2f}%".format(p * 100))
                 print("Average recall (py): {:.2f}%".format(r * 100))
-                print('end')
 
         for tmp_pronoun_type in interested_pronouns:
             print('Pronoun type:', tmp_pronoun_type)
