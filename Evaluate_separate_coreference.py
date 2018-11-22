@@ -115,6 +115,7 @@ if __name__ == "__main__":
                 all_coreference += len(pronoun_example['correct_NPs'])
                 result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(pronoun_example['correct_NPs'])
             if counter % 10 == 0:
+                print(predicted_cluster)
                 p = correct_predict_coreference / predict_coreference
                 r = correct_predict_coreference / all_coreference
                 f1 = 2 * p * r / (p + r)
