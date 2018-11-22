@@ -750,6 +750,8 @@ class CorefModel(object):
         # start to predict
         predicated_data = list()
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            if example_num != 262:
+                continue
             tmp_predicated_data = dict()
             tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
@@ -764,6 +766,8 @@ class CorefModel(object):
                 all_sentence += s
 
             for pronoun_example in example['pronoun_info']:
+                if pronoun_example != 19:
+                    continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
 
@@ -787,6 +791,7 @@ class CorefModel(object):
                         if antecedence_to_score[sorted_antecedents[i]] > 4 and [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]] in pronoun_example['candidate_NPs']:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
+                            print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                             if verify_correct_NP_match(
                                     [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['correct_NPs'],
                                     'exact'):
