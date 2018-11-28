@@ -8,6 +8,7 @@ import tensorflow_hub as hub
 import h5py
 import json
 import sys
+import os
 
 def build_elmo():
   token_ph = tf.placeholder(tf.string, [None, None])
@@ -47,6 +48,7 @@ def cache_dataset(data_path, session, token_ph, len_ph, lm_emb, out_file):
         print("Cached {} documents in {}".format(doc_num + 1, data_path))
 
 if __name__ == "__main__":
+  os.environ["CUDA_VISIBLE_DEVICES"] = "2"
   token_ph, len_ph, lm_emb = build_elmo()
   with tf.Session() as session:
     session.run(tf.global_variables_initializer())
