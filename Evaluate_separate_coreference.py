@@ -7,7 +7,7 @@ import ujson as json
 import os
 #
 import tensorflow as tf
-# import coref_model as cm
+import coref_model as cm
 import util
 from util import *
 from tqdm import tqdm
@@ -142,4 +142,7 @@ if __name__ == "__main__":
     print("Average F1 (py): {:.2f}%".format(f1 * 100))
     print("Average precision (py): {:.2f}%".format(p * 100))
     print("Average recall (py): {:.2f}%".format(r * 100))
+    print('correct_predict_coreference', correct_predict_coreference)
+    print('predict_coreference', predict_coreference)
+    print('all_coreference', all_coreference)
     print('end')
