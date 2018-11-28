@@ -750,8 +750,6 @@ class CorefModel(object):
         # start to predict
         predicated_data = list()
         for example_num, (tensorized_example, example) in enumerate(self.eval_data):
-            if example_num not in [262]:
-                continue
             tmp_predicated_data = dict()
             tmp_data_for_analysis = list()
             _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
