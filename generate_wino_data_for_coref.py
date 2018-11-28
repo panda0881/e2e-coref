@@ -51,6 +51,7 @@ def generate_one_conll_example_from_wino(sentence, pronoun, candidate_A, candida
     else:
         print(result)
     tmp_example['pronoun_info'] = [{'current_pronoun': pronoun_span[0], 'candidate_NPs': candidate_A_span+candidate_B_span, 'correct_NPs': correct_candidate_span}]
+    tmp_example['clusters'] = [pronoun_span+candidate_A_span+candidate_B_span]
 
     return tmp_example
 
