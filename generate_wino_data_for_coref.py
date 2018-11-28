@@ -26,7 +26,7 @@ def find_span(tokens, target_words):
 
 def generate_one_conll_example_from_wino(sentence, pronoun, candidate_A, candidate_B, result):
     tmp_example = dict()
-    tmp_example['doc_key'] = 'Wino'
+    tmp_example['doc_key'] = 'bc/cctv/00/cctv_0005_0'
     tmp_example['sentences'] = list()
     tmp_example['speakers'] = list()
     tmp_example['consituents'] = list()
