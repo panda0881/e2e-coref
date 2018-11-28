@@ -7,7 +7,7 @@ import ujson as json
 import os
 #
 import tensorflow as tf
-import coref_model as cm
+# import coref_model as cm
 import util
 from util import *
 from tqdm import tqdm
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     #         tmp_example['P_P_clusters'] = P_P_clusters
     #         test_data.append(tmp_example)
     # print('finish processing data')
-    with open('test.english.middle.pronoun.jsonlines', 'r') as f:
+    with open('test.english.jsonlines', 'r') as f:
         for line in f:
             test_data.append(json.loads(line))
 
