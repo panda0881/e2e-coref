@@ -764,8 +764,6 @@ class CorefModel(object):
                 all_sentence += s
 
             for i, pronoun_example in enumerate(example['pronoun_info']):
-                # if i not in [19]:
-                #     continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
 
@@ -791,12 +789,13 @@ class CorefModel(object):
                                     'cover'):
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
-                            print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
+                            # print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                             if verify_correct_NP_match(
                                     [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['correct_NPs'],
                                     'cover'):
                                 correct_predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
+                        break
                 all_coreference += len(pronoun_example['correct_NPs'])
                 result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                         pronoun_example['correct_NPs'])
