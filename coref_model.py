@@ -764,8 +764,8 @@ class CorefModel(object):
                 all_sentence += s
 
             for i, pronoun_example in enumerate(example['pronoun_info']):
-                if i not in [19]:
-                    continue
+                # if i not in [19]:
+                #     continue
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
 
