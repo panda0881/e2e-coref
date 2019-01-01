@@ -162,9 +162,12 @@ question_tuples.append(
 question_tuples.append(
     {'question_id': 283, 'candidate_A': ('figure', 'nsubj'), 'candidate_B': ('figure', 'dobj'), 'amod': 'simple', 'answer': 'B'})
 
-interested_wino_ids = list()
-for t in question_tuples:
-    interested_wino_ids.append(t['question_id'])
+# interested_wino_ids = list()
+# for t in question_tuples:
+#     interested_wino_ids.append(t['question_id'])
+
+with open('selected_winograd_questions.json', 'r') as f:
+    interested_wino_ids = json.load(f)
 
 # if __name__ == "__main__":
 # config = util.initialize_from_env()
