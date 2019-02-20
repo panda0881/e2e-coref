@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     model = cm.CorefModel(config)
     saver = tf.train.Saver()
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(config['GPU'])
 
     log_dir = config["log_dir"]
 
