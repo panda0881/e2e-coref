@@ -383,25 +383,23 @@ class CorefModel(object):
 
         candidate_span_emb = self.get_span_emb(flattened_head_emb, context_outputs, candidate_starts,
                                                candidate_ends)  # [num_candidates, emb]
-        # candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
-        # candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
+        candidate_mention_scores = self.get_mention_scores(candidate_span_emb)  # [k, 1]
+        candidate_mention_scores = tf.squeeze(candidate_mention_scores, 1)  # [k]
 
-        candidate_mention_scores = self.pseudo_get_mention_scores(candidate_starts, candidate_ends, gold_starts,
-                                                                  gold_ends)  # [num_candidates]
 
-        # k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
-        # top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
-        #                                            tf.expand_dims(candidate_starts, 0),
-        #                                            tf.expand_dims(candidate_ends, 0),
-        #                                            tf.expand_dims(k, 0),
-        #                                            util.shape(context_outputs, 0),
-        #                                            True)  # [1, k]
-        # top_span_indices.set_shape([1, None])
-        # top_span_indices = tf.squeeze(top_span_indices, 0)  # [k]
-        golden_mask = tf.greater(candidate_mention_scores, tf.zeros([util.shape(candidate_mention_scores, 0)]))
-        top_span_indices = tf.where(golden_mask)
-        k = util.shape(top_span_indices, 0)
-        top_span_indices = tf.reshape(top_span_indices, [k])
+        k = tf.to_int32(tf.floor(tf.to_float(tf.shape(context_outputs)[0]) * self.config["top_span_ratio"]))
+        top_span_indices = coref_ops.extract_spans(tf.expand_dims(candidate_mention_scores, 0),
+                                                   tf.expand_dims(candidate_starts, 0),
+                                                   tf.expand_dims(candidate_ends, 0),
+                                                   tf.expand_dims(k, 0),
+                                                   util.shape(context_outputs, 0),
+                                                   True)  # [1, k]
+        top_span_indices.set_shape([1, None])
+        top_span_indices = tf.squeeze(top_span_indices, 0)  # [k]
+        # golden_mask = tf.greater(candidate_mention_scores, tf.zeros([util.shape(candidate_mention_scores, 0)]))
+        # top_span_indices = tf.where(golden_mask)
+        # k = util.shape(top_span_indices, 0)
+        # top_span_indices = tf.reshape(top_span_indices, [k])
 
         top_span_starts = tf.gather(candidate_starts, top_span_indices)  # [k]
         top_span_ends = tf.gather(candidate_ends, top_span_indices)  # [k]
