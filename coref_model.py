@@ -777,7 +777,7 @@ class CorefModel(object):
                     if top_span_starts[i] == pronoun_example['current_pronoun'][0] and top_span_ends[i] == pronoun_example['current_pronoun'][1]:
                         pronoun_position = i
                         break
-                # print(pronoun_position)
+                print(pronoun_position)
                 if pronoun_position > 0:
                     # sorted_antecedents = top_antecedents[pronoun_position]
                     antecedence_to_score = dict()
@@ -794,7 +794,7 @@ class CorefModel(object):
                                     'cover'):
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
-                            # print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
+                            print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                             if verify_correct_NP_match(
                                     [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['correct_NPs'],
                                     'cover'):
@@ -804,6 +804,8 @@ class CorefModel(object):
                     all_coreference += len(pronoun_example['correct_NPs'])
                     result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                             pronoun_example['correct_NPs'])
+                    print('candidate:', pronoun_example['candidate_NPs'])
+                    print('correct', pronoun_example['correct_NPs'])
             if (example_num+1) % 10 == 0:
                 print(example_num)
                 p = correct_predict_coreference / predict_coreference
