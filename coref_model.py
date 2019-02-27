@@ -761,9 +761,16 @@ class CorefModel(object):
             for s in example['sentences']:
                 all_sentence += s
 
+            word_index_to_sentence_index = list()
+            for i, s in enumerate(example['sentences']):
+                for w in s:
+                    word_index_to_sentence_index.append(i)
+
             for i, pronoun_example in enumerate(example['pronoun_info']):
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
+
+                tmp_pronoun_sentence_index = word_index_to_sentence_index[tmp_pronoun]
 
                 pronoun_position = -1
                 for i in range(top_span_starts.shape[0]):
@@ -782,7 +789,7 @@ class CorefModel(object):
                     # print(antecedence_to_score)
                     for i in range(len(sorted_antecedents)):
                         tmp_NP_position = int(sorted_antecedents[i])
-                        if antecedence_to_score[sorted_antecedents[i]] > 0:
+                        if antecedence_to_score[sorted_antecedents[i]] > 0 and -2 <word_index_to_sentence_index[top_span_starts[tmp_NP_position]]-tmp_pronoun_sentence_index <= 0:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
                             # print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
