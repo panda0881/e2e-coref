@@ -789,7 +789,7 @@ class CorefModel(object):
                     # print(antecedence_to_score)
                     for i in range(len(sorted_antecedents)):
                         tmp_NP_position = int(sorted_antecedents[i])
-                        if antecedence_to_score[sorted_antecedents[i]] > 3 and verify_correct_NP_match(
+                        if antecedence_to_score[sorted_antecedents[i]] > 0 and verify_correct_NP_match(
                                     [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['candidate_NPs'],
                                     'cover'):
                             predict_coreference += 1
