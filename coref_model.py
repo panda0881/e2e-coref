@@ -770,7 +770,7 @@ class CorefModel(object):
                 tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
                 current_pronoun_type = get_pronoun_type(tmp_pronoun)
 
-                tmp_pronoun_sentence_index = word_index_to_sentence_index[tmp_pronoun]
+                tmp_pronoun_sentence_index = word_index_to_sentence_index[pronoun_example['current_pronoun'][0]]
 
                 pronoun_position = -1
                 for i in range(top_span_starts.shape[0]):
