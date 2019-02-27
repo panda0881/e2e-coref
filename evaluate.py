@@ -12,7 +12,7 @@ import util
 if __name__ == "__main__":
   config = util.initialize_from_env()
   model = cm.CorefModel(config)
-  os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+  os.environ["CUDA_VISIBLE_DEVICES"] = "0"
   with tf.Session() as session:
     model.restore(session)
     model.evaluate(session, official_stdout=True)
