@@ -812,17 +812,23 @@ class CorefModel(object):
                 print("Average F1 (py): {:.2f}%".format(f1 * 100))
                 print("Average precision (py): {:.2f}%".format(p * 100))
                 print("Average recall (py): {:.2f}%".format(r * 100))
+                print('correct_predict_coreference', correct_predict_coreference)
+                print('predict_coreference', predict_coreference)
+                print('all_coreference', all_coreference)
 
         for tmp_pronoun_type in interested_pronouns:
-            print('Pronoun type:', tmp_pronoun_type)
-            tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
-                    result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
-            tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
-                    result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
-            tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
-            print('p:', tmp_p)
-            print('r:', tmp_r)
-            print('f1:', tmp_f1)
+            try:
+                print('Pronoun type:', tmp_pronoun_type)
+                tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                        result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
+                tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                        result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
+                tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
+                print('p:', tmp_p)
+                print('r:', tmp_r)
+                print('f1:', tmp_f1)
+            except:
+                pass
         p = correct_predict_coreference / predict_coreference
         r = correct_predict_coreference / all_coreference
         f1 = 2 * p * r / (p + r)
