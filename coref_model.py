@@ -782,9 +782,7 @@ class CorefModel(object):
                     # print(antecedence_to_score)
                     for i in range(len(sorted_antecedents)):
                         tmp_NP_position = int(sorted_antecedents[i])
-                        if antecedence_to_score[sorted_antecedents[i]] > 0 and verify_correct_NP_match(
-                                    [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['candidate_NPs'],
-                                    'cover'):
+                        if antecedence_to_score[sorted_antecedents[i]] > 0:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
                             # print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
@@ -806,16 +804,16 @@ class CorefModel(object):
             #     print("Average precision (py): {:.2f}%".format(p * 100))
             #     print("Average recall (py): {:.2f}%".format(r * 100))
 
-        # for tmp_pronoun_type in interested_pronouns:
-        #     print('Pronoun type:', tmp_pronoun_type)
-        #     tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
-        #             result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
-        #     tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
-        #             result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
-        #     tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
-        #     print('p:', tmp_p)
-        #     print('r:', tmp_r)
-        #     print('f1:', tmp_f1)
+        for tmp_pronoun_type in interested_pronouns:
+            print('Pronoun type:', tmp_pronoun_type)
+            tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                    result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
+            tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                    result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
+            tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
+            print('p:', tmp_p)
+            print('r:', tmp_r)
+            print('f1:', tmp_f1)
         p = correct_predict_coreference / predict_coreference
         r = correct_predict_coreference / all_coreference
         f1 = 2 * p * r / (p + r)

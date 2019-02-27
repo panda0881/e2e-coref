@@ -19,10 +19,10 @@ from tqdm import tqdm
 #     model.restore(session)
 #     model.evaluate(session, official_stdout=True)
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     test_data = list()
     print('Start to process data...')
-    with open('test.english.middle.pronoun.jsonlines', 'r') as f:
+    with open('conll_data/test.pronoun.jsonlines', 'r') as f:
         for line in f:
             test_data.append(json.loads(line))
 
