@@ -772,7 +772,7 @@ class CorefModel(object):
                                     'cover'):
                                 correct_predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
-                            # break
+                            break
                     all_coreference += len(pronoun_example['correct_NPs'])
                     result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                                 pronoun_example['correct_NPs'])
