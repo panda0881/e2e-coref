@@ -763,19 +763,19 @@ class CorefModel(object):
                     # print(antecedence_to_score)
                     for i in range(len(sorted_antecedents)):
                         tmp_NP_position = int(sorted_antecedents[i])
-                        if antecedence_to_score[sorted_antecedents[i]] > 0 and -2 < word_index_to_sentence_index[top_span_starts[tmp_NP_position]] - tmp_pronoun_sentence_index <= 0:
+                        if antecedence_to_score[sorted_antecedents[i]] > 3 and -2 < word_index_to_sentence_index[top_span_starts[tmp_NP_position]] - tmp_pronoun_sentence_index <= 0:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
-                            print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
+                            # print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
                             if verify_correct_NP_match(
                                     [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['correct_NPs'],
                                     'cover'):
                                 correct_predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
                             # break
-                all_coreference += len(pronoun_example['correct_NPs'])
-                result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
-                            pronoun_example['correct_NPs'])
+                    all_coreference += len(pronoun_example['correct_NPs'])
+                    result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
+                                pronoun_example['correct_NPs'])
                     # print('candidate:', pronoun_example['candidate_NPs'])
                     # print('correct', pronoun_example['correct_NPs'])
             if (example_num+1) % 10 == 0:
