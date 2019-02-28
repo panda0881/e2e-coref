@@ -634,3 +634,118 @@ class CorefModel(object):
         print("Average recall (py): {:.2f}%".format(r * 100))
 
         return util.make_summary(summary_dict), average_f1
+
+    def evaluate_pronoun_coreference(self, session, evaluation_data):
+        data_for_analysis = list()
+
+        # setting up
+        def load_data_by_line(example):
+            return self.tensorize_example(example, is_training=False), example
+
+        self.eval_data = [load_data_by_line(e) for e in evaluation_data]
+        num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
+        print("Loaded {} eval examples.".format(len(self.eval_data)))
+        all_coreference = 0
+        predict_coreference = 0
+        correct_predict_coreference = 0
+        result_by_pronoun_type = dict()
+        for tmp_pronoun_type in interested_pronouns:
+            result_by_pronoun_type[tmp_pronoun_type] = {'all_coreference': 0, 'predict_coreference': 0,
+                                                        'correct_predict_coreference': 0}
+
+        # start to predict
+        predicated_data = list()
+        for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            tmp_predicated_data = dict()
+            tmp_data_for_analysis = list()
+            _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
+            feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
+            candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(
+                self.predictions, feed_dict=feed_dict)
+            predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
+            # predicted_clusters = self.separate_clusters(top_span_starts, top_span_ends, predicted_antecedents, example)
+            # print('number of all NP:', len(all_NPs))
+            all_sentence = list()
+            for s in example['sentences']:
+                all_sentence += s
+
+            word_index_to_sentence_index = list()
+            for i, s in enumerate(example['sentences']):
+                for w in s:
+                    word_index_to_sentence_index.append(i)
+
+            for i, pronoun_example in enumerate(example['pronoun_info']):
+                tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
+                current_pronoun_type = get_pronoun_type(tmp_pronoun)
+
+                tmp_pronoun_sentence_index = word_index_to_sentence_index[pronoun_example['current_pronoun'][0]]
+
+                pronoun_position = -1
+                for i in range(top_span_starts.shape[0]):
+                    if top_span_starts[i] == pronoun_example['current_pronoun'][0] and top_span_ends[i] == pronoun_example['current_pronoun'][1]:
+                        pronoun_position = i
+                        break
+                print(pronoun_position)
+                if pronoun_position > 0:
+                    # sorted_antecedents = top_antecedents[pronoun_position]
+                    antecedence_to_score = dict()
+                    for i in range(len(top_antecedents[pronoun_position])):
+                        antecedence_to_score[str(top_antecedents[pronoun_position][i])] = \
+                            top_antecedent_scores[pronoun_position][i + 1]
+                    sorted_antecedents = sorted(antecedence_to_score, key=lambda x: antecedence_to_score[x],
+                                                reverse=True)
+                    # print(antecedence_to_score)
+                    for i in range(len(sorted_antecedents)):
+                        tmp_NP_position = int(sorted_antecedents[i])
+                        if antecedence_to_score[sorted_antecedents[i]] > 0 and verify_correct_NP_match(
+                                    [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['candidate_NPs'],
+                                    'cover'):
+                            predict_coreference += 1
+                            result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
+                            print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
+                            if verify_correct_NP_match(
+                                    [top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]], pronoun_example['correct_NPs'],
+                                    'cover'):
+                                correct_predict_coreference += 1
+                                result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
+                            # break
+                    all_coreference += len(pronoun_example['correct_NPs'])
+                    result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
+                            pronoun_example['correct_NPs'])
+                    print('candidate:', pronoun_example['candidate_NPs'])
+                    print('correct', pronoun_example['correct_NPs'])
+            if (example_num+1) % 10 == 0:
+                print(example_num)
+                p = correct_predict_coreference / predict_coreference
+                r = correct_predict_coreference / all_coreference
+                f1 = 2 * p * r / (p + r)
+                print("Average F1 (py): {:.2f}%".format(f1 * 100))
+                print("Average precision (py): {:.2f}%".format(p * 100))
+                print("Average recall (py): {:.2f}%".format(r * 100))
+                print('correct_predict_coreference', correct_predict_coreference)
+                print('predict_coreference', predict_coreference)
+                print('all_coreference', all_coreference)
+
+        for tmp_pronoun_type in interested_pronouns:
+            try:
+                print('Pronoun type:', tmp_pronoun_type)
+                tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                        result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
+                tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                        result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
+                tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
+                print('p:', tmp_p)
+                print('r:', tmp_r)
+                print('f1:', tmp_f1)
+            except:
+                pass
+        p = correct_predict_coreference / predict_coreference
+        r = correct_predict_coreference / all_coreference
+        f1 = 2 * p * r / (p + r)
+        print("Average F1 (py): {:.2f}%".format(f1 * 100))
+        print("Average precision (py): {:.2f}%".format(p * 100))
+        print("Average recall (py): {:.2f}%".format(r * 100))
+        print('correct_predict_coreference', correct_predict_coreference)
+        print('predict_coreference', predict_coreference)
+        print('all_coreference', all_coreference)
+        print('end')

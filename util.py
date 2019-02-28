@@ -400,118 +400,83 @@ def post_ranking(example, pronoun_position, top_NPs):
     # return top_NPs
 
 
-
-def verify_correct_NP_match(predicted_NP, gold_NPs, model):
-    if model == 'exact':
-        for tmp_gold_NP in gold_NPs:
-            if tmp_gold_NP[0] == predicted_NP[0] and tmp_gold_NP[1] == predicted_NP[1]:
-                return True
-    elif model == 'cover':
-        for tmp_gold_NP in gold_NPs:
-            if tmp_gold_NP[0] <= predicted_NP[0] and tmp_gold_NP[1] >= predicted_NP[1]:
-                return True
-            if tmp_gold_NP[0] >= predicted_NP[0] and tmp_gold_NP[1] <= predicted_NP[1]:
-                return True
-    return False
-
-def filter_stop_words(input_sentence, stop_words):
-    result = list()
-    for w in input_sentence:
-        if w in stop_words:
-            continue
-        result.append(w)
-    return result
-
-
-def get_coverage(w_list1, w_list2):
-    if len(w_list1) == 0:
-        return 0
-    tmp_count = 0
-    for w in w_list1:
-        if w in w_list2:
-            tmp_count += 1
-    # if tmp_count > 0:
-    #     print('')
-    return tmp_count / len(w_list1)
-
-
-def verify_match(coreference_pair, OMCS_pair, limitation=0.9):
-    if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1],
-                                                                                      OMCS_pair[1]) >= limitation:
-        return True
-    if get_coverage(coreference_pair[0], OMCS_pair[1]) >= limitation and get_coverage(coreference_pair[1],
-                                                                                      OMCS_pair[0]) >= limitation:
-        return True
-    return False
-
-
-def get_pronoun_related_words(example, pronoun_position):
-    related_words = list()
-    separate_sentence_range = list()
-    all_sentence = list()
-    for s in example['sentences']:
-        separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s) - 1))
-        all_sentence += s
-    target_sentence = ''
-    sentence_position = 0
-    for j, sentence_s_e in enumerate(separate_sentence_range):
-        if sentence_s_e[0] <= pronoun_position[0] <= sentence_s_e[1]:
-            for w in example['sentences'][j]:
-                target_sentence += ' '
-                target_sentence += w
-            sentence_position = pronoun_position[0] - sentence_s_e[0]
-            break
-    if len(target_sentence) > 0:
-        target_sentence = target_sentence[1:]
-    tmp_output = nlp_list[0].annotate(target_sentence,
-                                      properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
-    for s in tmp_output['sentences']:
-        enhanced_dependency_list = s['enhancedPlusPlusDependencies']
-        for relation in enhanced_dependency_list:
-            if relation['dep'] == 'ROOT':
-                continue
-            governor_position = relation['governor']
-            dependent_position = relation['dependent']
-            if relation[
-                'governorGloss'] in all_pronouns and sentence_position <= governor_position <= sentence_position + 2:
-                if relation['dep'] in ['dobj', 'nsubj']:
-                    related_words.append(relation['dependentGloss'])
-
-            if relation[
-                'dependentGloss'] in all_pronouns and sentence_position <= dependent_position <= sentence_position + 2:
-                if relation['dep'] in ['dobj', 'nsubj']:
-                    related_words.append(relation['governorGloss'])
-
-        # Before_length += len(s['tokens'])
-    return related_words
-
-
-# def filter_NP_based_on_ner()
-
-
-def post_ranking(example, pronoun_position, top_NPs):
-    if len(top_NPs) == 0:
-        return []
-    pronoun_related_words = get_pronoun_related_words(example, pronoun_position)
-    # top_NP_words = list()
-    NP_match_scores = list()
-    all_sentence = list()
-    for s in example['sentences']:
-        all_sentence += s
-    print('pronoun related words:', pronoun_related_words)
-    for NP_position in top_NPs:
-        # top_NP_words.append(all_sentence[NP_position])
-        current_NP = all_sentence[NP_position[0]:NP_position[1]+1]
-        print(current_NP, NP_position)
-        tmp_score = 0
-        for related_word in pronoun_related_words:
-            for OMCS_pair in OMCS_data:
-                if related_word not in stop_words and verify_match((filter_stop_words(current_NP, stop_words), [related_word]), OMCS_pair[1:]):
-                    tmp_score += 1
-        NP_match_scores.append(tmp_score)
-    print(NP_match_scores)
-    return top_NPs, NP_match_scores
-    # return top_NPs
+# def verify_match(coreference_pair, OMCS_pair, limitation=0.9):
+#     if get_coverage(coreference_pair[0], OMCS_pair[0]) >= limitation and get_coverage(coreference_pair[1],
+#                                                                                       OMCS_pair[1]) >= limitation:
+#         return True
+#     if get_coverage(coreference_pair[0], OMCS_pair[1]) >= limitation and get_coverage(coreference_pair[1],
+#                                                                                       OMCS_pair[0]) >= limitation:
+#         return True
+#     return False
+#
+#
+# def get_pronoun_related_words(example, pronoun_position):
+#     related_words = list()
+#     separate_sentence_range = list()
+#     all_sentence = list()
+#     for s in example['sentences']:
+#         separate_sentence_range.append((len(all_sentence), len(all_sentence) + len(s) - 1))
+#         all_sentence += s
+#     target_sentence = ''
+#     sentence_position = 0
+#     for j, sentence_s_e in enumerate(separate_sentence_range):
+#         if sentence_s_e[0] <= pronoun_position[0] <= sentence_s_e[1]:
+#             for w in example['sentences'][j]:
+#                 target_sentence += ' '
+#                 target_sentence += w
+#             sentence_position = pronoun_position[0] - sentence_s_e[0]
+#             break
+#     if len(target_sentence) > 0:
+#         target_sentence = target_sentence[1:]
+#     tmp_output = nlp_list[0].annotate(target_sentence,
+#                                       properties={'annotators': 'tokenize,depparse,lemma', 'outputFormat': 'json'})
+#     for s in tmp_output['sentences']:
+#         enhanced_dependency_list = s['enhancedPlusPlusDependencies']
+#         for relation in enhanced_dependency_list:
+#             if relation['dep'] == 'ROOT':
+#                 continue
+#             governor_position = relation['governor']
+#             dependent_position = relation['dependent']
+#             if relation[
+#                 'governorGloss'] in all_pronouns and sentence_position <= governor_position <= sentence_position + 2:
+#                 if relation['dep'] in ['dobj', 'nsubj']:
+#                     related_words.append(relation['dependentGloss'])
+#
+#             if relation[
+#                 'dependentGloss'] in all_pronouns and sentence_position <= dependent_position <= sentence_position + 2:
+#                 if relation['dep'] in ['dobj', 'nsubj']:
+#                     related_words.append(relation['governorGloss'])
+#
+#         # Before_length += len(s['tokens'])
+#     return related_words
+#
+#
+# # def filter_NP_based_on_ner()
+#
+#
+# def post_ranking(example, pronoun_position, top_NPs):
+#     if len(top_NPs) == 0:
+#         return []
+#     pronoun_related_words = get_pronoun_related_words(example, pronoun_position)
+#     # top_NP_words = list()
+#     NP_match_scores = list()
+#     all_sentence = list()
+#     for s in example['sentences']:
+#         all_sentence += s
+#     print('pronoun related words:', pronoun_related_words)
+#     for NP_position in top_NPs:
+#         # top_NP_words.append(all_sentence[NP_position])
+#         current_NP = all_sentence[NP_position[0]:NP_position[1]+1]
+#         print(current_NP, NP_position)
+#         tmp_score = 0
+#         for related_word in pronoun_related_words:
+#             for OMCS_pair in OMCS_data:
+#                 if related_word not in stop_words and verify_match((filter_stop_words(current_NP, stop_words), [related_word]), OMCS_pair[1:]):
+#                     tmp_score += 1
+#         NP_match_scores.append(tmp_score)
+#     print(NP_match_scores)
+#     return top_NPs, NP_match_scores
+#     # return top_NPs
 
 def get_pronoun_type(input_pronoun):
     for tmp_type in interested_pronouns:

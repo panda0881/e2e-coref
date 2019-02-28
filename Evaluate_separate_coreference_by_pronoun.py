@@ -7,7 +7,7 @@ import ujson as json
 import os
 #
 import tensorflow as tf
-import coref_model as cm
+import original_model as cm
 import util
 from util import *
 from tqdm import tqdm
