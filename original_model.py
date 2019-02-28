@@ -686,10 +686,10 @@ class CorefModel(object):
                 print("Evaluated {}/{} examples.".format(example_num + 1, len(self.eval_data)))
 
         summary_dict = {}
-        conll_results = conll.evaluate_conll(self.config["conll_eval_path"], coref_predictions, official_stdout)
-        average_f1 = sum(results["f"] for results in conll_results.values()) / len(conll_results)
-        summary_dict["Average F1 (conll)"] = average_f1
-        print("Average F1 (conll): {:.2f}%".format(average_f1))
+        # conll_results = conll.evaluate_conll(self.config["conll_eval_path"], coref_predictions, official_stdout)
+        # average_f1 = sum(results["f"] for results in conll_results.values()) / len(conll_results)
+        # summary_dict["Average F1 (conll)"] = average_f1
+        # print("Average F1 (conll): {:.2f}%".format(average_f1))
 
         p, r, f = coref_evaluator.get_prf()
         summary_dict["Average F1 (py)"] = f
@@ -699,7 +699,7 @@ class CorefModel(object):
         summary_dict["Average recall (py)"] = r
         print("Average recall (py): {:.2f}%".format(r * 100))
 
-        return util.make_summary(summary_dict), average_f1
+        return util.make_summary(summary_dict), f
 
     def evaluate_pronoun_coreference(self, session, evaluation_data):
         data_for_analysis = list()
