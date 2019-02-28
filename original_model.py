@@ -763,7 +763,7 @@ class CorefModel(object):
                     # print(antecedence_to_score)
                     for i in range(len(sorted_antecedents)):
                         tmp_NP_position = int(sorted_antecedents[i])
-                        if antecedence_to_score[sorted_antecedents[i]] > 0 and -2 < word_index_to_sentence_index[top_span_starts[tmp_NP_position]] - tmp_pronoun_sentence_index <= 0:
+                        if antecedence_to_score[sorted_antecedents[i]] > 0 and -2 <= word_index_to_sentence_index[top_span_starts[tmp_NP_position]] - tmp_pronoun_sentence_index <= 0:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
                             # print([top_span_starts[tmp_NP_position], top_span_ends[tmp_NP_position]])
@@ -777,7 +777,7 @@ class CorefModel(object):
                     result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                                 pronoun_example['correct_NPs'])
                     for tmp_NP in pronoun_example['correct_NPs']:
-                        if -2 < word_index_to_sentence_index[tmp_NP[0]] - tmp_pronoun_sentence_index <= 0:
+                        if -2 <= word_index_to_sentence_index[tmp_NP[0]] - tmp_pronoun_sentence_index <= 0:
                             continue
                         print('Some thing is wrong with the word 2 sentence.')
                         print(example['sentences'])
