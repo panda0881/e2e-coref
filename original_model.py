@@ -772,10 +772,17 @@ class CorefModel(object):
                                     'cover'):
                                 correct_predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
-                            break
+                            # break
                     all_coreference += len(pronoun_example['correct_NPs'])
                     result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                                 pronoun_example['correct_NPs'])
+                    for tmp_NP in pronoun_example['correct_NPs']:
+                        if -2 < word_index_to_sentence_index[tmp_NP[0]] - tmp_pronoun_sentence_index <= 0:
+                            continue
+                        print('Some thing is wrong with the word 2 sentence.')
+                        print(example['sentences'])
+                        print(tmp_pronoun, tmp_pronoun_sentence_index)
+                        print(tmp_NP, word_index_to_sentence_index[tmp_NP[0]])
                     # print('candidate:', pronoun_example['candidate_NPs'])
                     # print('correct', pronoun_example['correct_NPs'])
             if (example_num+1) % 10 == 0:
