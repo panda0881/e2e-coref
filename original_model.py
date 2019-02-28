@@ -19,6 +19,72 @@ import conll
 import metrics
 
 
+third_personal_pronouns = ['she', 'her', 'he', 'him', 'them', 'they', 'She', 'Her', 'He', 'Him', 'Them',
+                           'They', 'it', 'It']
+
+neutral_pronoun = ['it', 'It']
+
+first_and_second_personal_pronouns = ['I', 'me', 'we', 'us', 'you', 'Me', 'We', 'Us', 'You']
+relative_pronouns = ['that', 'which', 'who', 'whom', 'whose', 'whichever', 'whoever', 'whomever',
+                     'That', 'Which', 'Who', 'Whom', 'Whose', 'Whichever', 'Whoever', 'Whomever']
+demonstrative_pronouns = ['this', 'these', 'that', 'those', 'This', 'These', 'That', 'Those']
+indefinite_pronouns = ['anybody', 'anyone', 'anything', 'each', 'either', 'everybody', 'everyone', 'everything',
+                       'neither', 'nobody', 'none', 'nothing', 'one', 'somebody', 'someone', 'something', 'both',
+                       'few', 'many', 'several', 'all', 'any', 'most', 'some',
+                       'Anybody', 'Anyone', 'Anything', 'Each', 'Either', 'Everybody', 'Everyone', 'Everything',
+                       'Neither', 'Nobody', 'None', 'Nothing', 'One', 'Somebody', 'Someone', 'Something', 'Both',
+                       'Few', 'Many', 'Several', 'All', 'Any', 'Most', 'Some']
+reflexive_pronouns = ['myself', 'ourselves', 'yourself', 'yourselves', 'himself', 'herself', 'itself', 'themselves',
+                      'Myself', 'Ourselves', 'Yourself', 'Yourselves', 'Himself', 'Herself', 'Itself', 'Themselves']
+interrogative_pronouns = ['what', 'who', 'which', 'whom', 'whose', 'What', 'Who', 'Which', 'Whom', 'Whose']
+all_possessive_pronoun = ['my', 'your', 'his', 'her', 'its', 'our', 'your', 'their', 'mine', 'yours', 'his', 'hers', 'ours',
+                      'yours', 'theirs', 'My', 'Your', 'His', 'Her', 'Its', 'Our', 'Your', 'Their', 'Mine', 'Yours',
+                      'His', 'Hers', 'Ours', 'Yours', 'Theirs']
+possessive_pronoun = ['his', 'hers', 'its', 'their', 'theirs', 'His', 'Hers', 'Its', 'Their', 'Theirs']
+
+all_pronouns_by_type = dict()
+all_pronouns_by_type['first_and_second_personal'] = first_and_second_personal_pronouns
+all_pronouns_by_type['third_personal'] = third_personal_pronouns
+all_pronouns_by_type['neutral'] = neutral_pronoun
+all_pronouns_by_type['relative'] = relative_pronouns
+all_pronouns_by_type['demonstrative'] = demonstrative_pronouns
+all_pronouns_by_type['indefinite'] = indefinite_pronouns
+all_pronouns_by_type['reflexive'] = reflexive_pronouns
+all_pronouns_by_type['interrogative'] = interrogative_pronouns
+all_pronouns_by_type['possessive'] = possessive_pronoun
+
+all_pronouns = list()
+for pronoun_type in all_pronouns_by_type:
+    all_pronouns += all_pronouns_by_type[pronoun_type]
+
+all_pronouns = set(all_pronouns)
+
+interested_pronouns = ['third_personal', 'possessive', 'demonstrative']
+
+interested_entity_types = ['NATIONALITY', 'ORGANIZATION', 'PERSON', 'DATE', 'CAUSE_OF_DEATH', 'CITY', 'LOCATION',
+                           'NUMBER', 'TITLE', 'TIME', 'ORDINAL', 'DURATION', 'MISC', 'COUNTRY', 'SET', 'PERCENT',
+                           'STATE_OR_PROVINCE', 'MONEY', 'CRIMINAL_CHARGE', 'IDEOLOGY', 'RELIGION', 'URL', 'EMAIL']
+
+def get_pronoun_type(input_pronoun):
+    for tmp_type in interested_pronouns:
+        if input_pronoun in all_pronouns_by_type[tmp_type]:
+            return tmp_type
+
+def verify_correct_NP_match(predicted_NP, gold_NPs, model):
+    if model == 'exact':
+        if predicted_NP in gold_NPs:
+            return True
+        else:
+            return False
+    elif model == 'cover':
+        for tmp_gold_NP in gold_NPs:
+            if tmp_gold_NP[0] <= predicted_NP[0] and tmp_gold_NP[1] >= predicted_NP[1]:
+                return True
+            if tmp_gold_NP[0] >= predicted_NP[0] and tmp_gold_NP[1] <= predicted_NP[1]:
+                return True
+    return False
+
+
 class CorefModel(object):
     def __init__(self, config):
         self.config = config
