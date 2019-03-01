@@ -729,7 +729,7 @@ class CorefModel(object):
                 self.predictions, feed_dict=feed_dict)
             predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
             predicted_clusters, _ = self.get_predicted_clusters(top_span_starts, top_span_ends, predicted_antecedents)
-            print('predicted clusters:', predicted_clusters)
+            # print('predicted clusters:', predicted_clusters)
             # print('number of all NP:', len(all_NPs))
             all_sentence = list()
             for s in example['sentences']:
