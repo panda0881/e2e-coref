@@ -747,15 +747,19 @@ class CorefModel(object):
 
                 tmp_pronoun_sentence_index = word_index_to_sentence_index[pronoun_example['current_pronoun'][0]]
 
+                print('pronoun position:', pronoun_example['current_pronoun'])
+                print('sentence position:', pronoun_example[''])
                 correct_cluster = None
                 for c in predicted_clusters:
                     if pronoun_example['current_pronoun'] in c:
                         correct_cluster = c
+                        print('found one correct_cluster:', c)
                         break
                 if correct_cluster:
                     for NP in correct_cluster:
                         if all_sentence[NP[0]:NP[1]+1] == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
                             continue
+                        print(word_index_to_sentence_index[NP[0]])
                         if -2 <= word_index_to_sentence_index[NP[0]] - tmp_pronoun_sentence_index <= 0:
                             predict_coreference += 1
                             result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
