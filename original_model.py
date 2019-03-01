@@ -748,14 +748,20 @@ class CorefModel(object):
 
                 # print('pronoun position:', pronoun_example['current_pronoun'])
                 # print('sentence position:', tmp_pronoun_sentence_index)
-                correct_cluster = None
+                predict_cluster = None
                 for c in predicted_clusters:
                     if tuple(pronoun_example['current_pronoun']) in c:
-                        correct_cluster = c
+                        predict_cluster = c
                         # print('found one correct_cluster:', c)
                         break
-                if correct_cluster:
-                    for NP in correct_cluster:
+                correct_cluster = None
+                for c in example['clusters']:
+                    if tuple(pronoun_example) in c:
+                        correct_cluster = c
+                        break
+
+                if predict_cluster:
+                    for NP in predict_cluster:
                         # if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
                         #     print('target pronoun:', tmp_pronoun)
                         #     print('target pronoun position:', example['pronoun_info'][i]['current_pronoun'])
@@ -767,9 +773,9 @@ class CorefModel(object):
                         #     else:
                         #         print('False')
                         #     continue
-                        if NP[0] == pronoun_example['current_pronoun'][0] and NP[1] == pronoun_example['current_pronoun'][1]:
+                        if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns and verify_correct_NP_match(NP, correct_cluster, 'exact'):
                             print('target pronoun:', tmp_pronoun)
-                            print('target pronoun position:', example['pronoun_info'][i]['current_pronoun'])
+                            print('target pronoun position:', pronoun_example['current_pronoun'])
                             print('find one pronoun:', all_sentence[NP[0]:NP[1]+1])
                             print('position:', NP)
                             print('label:')
