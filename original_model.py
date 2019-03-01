@@ -72,10 +72,9 @@ def get_pronoun_type(input_pronoun):
 
 def verify_correct_NP_match(predicted_NP, gold_NPs, model):
     if model == 'exact':
-        if predicted_NP in gold_NPs:
-            return True
-        else:
-            return False
+        for tmp_gold_NP in gold_NPs:
+            if tmp_gold_NP[0] == predicted_NP[0] and tmp_gold_NP[1] == predicted_NP[1]:
+                return True
     elif model == 'cover':
         for tmp_gold_NP in gold_NPs:
             if tmp_gold_NP[0] <= predicted_NP[0] and tmp_gold_NP[1] >= predicted_NP[1]:
