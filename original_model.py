@@ -765,8 +765,8 @@ class CorefModel(object):
                             if verify_correct_NP_match(NP, pronoun_example['correct_NPs'], 'exact'):
                                 correct_predict_coreference += 1
                                 result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
-                    all_coreference += len(pronoun_example['correct_NPs'])
-                    result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
+                all_coreference += len(pronoun_example['correct_NPs'])
+                result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
                                 pronoun_example['correct_NPs'])
             if (example_num+1) % 10 == 0:
                 print(example_num)
