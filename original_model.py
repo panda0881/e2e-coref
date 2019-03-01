@@ -756,7 +756,7 @@ class CorefModel(object):
                         break
                 correct_cluster = None
                 for c in example['clusters']:
-                    if tuple(pronoun_example) in c:
+                    if verify_correct_NP_match(pronoun_example['current_pronoun'], c, 'exact'):
                         correct_cluster = c
                         break
 
