@@ -756,7 +756,18 @@ class CorefModel(object):
                         break
                 if correct_cluster:
                     for NP in correct_cluster:
-                        if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
+                        # if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
+                        #     print('target pronoun:', tmp_pronoun)
+                        #     print('target pronoun position:', example['pronoun_info'][i]['current_pronoun'])
+                        #     print('find one pronoun:', all_sentence[NP[0]:NP[1]+1])
+                        #     print('position:', NP)
+                        #     print('label:')
+                        #     if verify_correct_NP_match(NP, pronoun_example['correct_NPs'], 'exact'):
+                        #         print('True')
+                        #     else:
+                        #         print('False')
+                        #     continue
+                        if NP[0] == pronoun_example['current_pronoun'][0] and NP[1] == pronoun_example['current_pronoun'][1]:
                             print('target pronoun:', tmp_pronoun)
                             print('target pronoun position:', example['pronoun_info'][i]['current_pronoun'])
                             print('find one pronoun:', all_sentence[NP[0]:NP[1]+1])
@@ -767,8 +778,6 @@ class CorefModel(object):
                             else:
                                 print('False')
                             continue
-                        # if NP[0] == pronoun_example['current_pronoun'][0] and NP[1] == pronoun_example['current_pronoun'][1]:
-                        #     continue
                         # print(word_index_to_sentence_index[NP[0]])
                         if -2 <= word_index_to_sentence_index[NP[0]] - tmp_pronoun_sentence_index <= 0:
                             predict_coreference += 1
