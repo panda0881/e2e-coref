@@ -762,27 +762,23 @@ class CorefModel(object):
 
                 if predict_cluster:
                     for NP in predict_cluster:
-                        # if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
-                        #     print('target pronoun:', tmp_pronoun)
-                        #     print('target pronoun position:', example['pronoun_info'][i]['current_pronoun'])
-                        #     print('find one pronoun:', all_sentence[NP[0]:NP[1]+1])
-                        #     print('position:', NP)
-                        #     print('label:')
-                        #     if verify_correct_NP_match(NP, pronoun_example['correct_NPs'], 'exact'):
-                        #         print('True')
-                        #     else:
-                        #         print('False')
-                        #     continue
-                        if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns and verify_correct_NP_match(NP, correct_cluster, 'exact'):
-                            print('target pronoun:', tmp_pronoun)
-                            print('target pronoun position:', pronoun_example['current_pronoun'])
-                            print('find one pronoun:', all_sentence[NP[0]:NP[1]+1])
-                            print('position:', NP)
-                            print('label:')
+                        if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
                             if verify_correct_NP_match(NP, pronoun_example['correct_NPs'], 'exact'):
-                                print('True')
-                            else:
-                                print('False')
+                                print('target pronoun:', tmp_pronoun)
+                                print('target pronoun position:', example['pronoun_info'][i]['current_pronoun'])
+                                print('find one pronoun:', all_sentence[NP[0]:NP[1] + 1])
+                                print('position:', NP)
+                                print('label:')
+                        if len(all_sentence[NP[0]:NP[1]+1]) == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns and verify_correct_NP_match(NP, correct_cluster, 'exact'):
+                            # print('target pronoun:', tmp_pronoun)
+                            # print('target pronoun position:', pronoun_example['current_pronoun'])
+                            # print('find one pronoun:', all_sentence[NP[0]:NP[1]+1])
+                            # print('position:', NP)
+                            # print('label:')
+                            # if verify_correct_NP_match(NP, pronoun_example['correct_NPs'], 'exact'):
+                            #     print('True')
+                            # else:
+                            #     print('False')
                             continue
                         # print(word_index_to_sentence_index[NP[0]])
                         if -2 <= word_index_to_sentence_index[NP[0]] - tmp_pronoun_sentence_index <= 0:
