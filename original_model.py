@@ -701,6 +701,105 @@ class CorefModel(object):
 
         return util.make_summary(summary_dict), f
 
+    def evaluate_pronoun_coreference_based_on_cluster(self, session, evaluation_data):
+        data_for_analysis = list()
+
+        # setting up
+        def load_data_by_line(example):
+            return self.tensorize_example(example, is_training=False), example
+
+        self.eval_data = [load_data_by_line(e) for e in evaluation_data]
+        num_words = sum(tensorized_example[2].sum() for tensorized_example, _ in self.eval_data)
+        print("Loaded {} eval examples.".format(len(self.eval_data)))
+        all_coreference = 0
+        predict_coreference = 0
+        correct_predict_coreference = 0
+        result_by_pronoun_type = dict()
+        for tmp_pronoun_type in interested_pronouns:
+            result_by_pronoun_type[tmp_pronoun_type] = {'all_coreference': 0, 'predict_coreference': 0,
+                                                        'correct_predict_coreference': 0}
+
+        # start to predict
+        predicated_data = list()
+        for example_num, (tensorized_example, example) in enumerate(self.eval_data):
+            tmp_predicated_data = dict()
+            tmp_data_for_analysis = list()
+            _, _, _, _, _, _, _, _, _, gold_starts, gold_ends, _ = tensorized_example
+            feed_dict = {i: t for i, t in zip(self.input_tensors, tensorized_example)}
+            candidate_starts, candidate_ends, candidate_mention_scores, top_span_starts, top_span_ends, top_antecedents, top_antecedent_scores = session.run(
+                self.predictions, feed_dict=feed_dict)
+            predicted_antecedents = self.get_predicted_antecedents(top_antecedents, top_antecedent_scores)
+            predicted_clusters, _ = self.get_predicted_clusters(top_span_starts, top_span_ends, predicted_antecedents)
+            # print('number of all NP:', len(all_NPs))
+            all_sentence = list()
+            for s in example['sentences']:
+                all_sentence += s
+
+            word_index_to_sentence_index = list()
+            for i, s in enumerate(example['sentences']):
+                for w in s:
+                    word_index_to_sentence_index.append(i)
+
+            for i, pronoun_example in enumerate(example['pronoun_info']):
+                tmp_pronoun = all_sentence[pronoun_example['current_pronoun'][0]]
+                current_pronoun_type = get_pronoun_type(tmp_pronoun)
+
+                tmp_pronoun_sentence_index = word_index_to_sentence_index[pronoun_example['current_pronoun'][0]]
+
+                correct_cluster = None
+                for c in predicted_clusters:
+                    if pronoun_example['current_pronoun'] in c:
+                        correct_cluster = c
+                        break
+                if correct_cluster:
+                    for NP in correct_cluster:
+                        if all_sentence[NP[0]:NP[1]+1] == 1 and all_sentence[NP[0]:NP[1]+1][0] in all_pronouns:
+                            continue
+                        if -2 <= word_index_to_sentence_index[NP[0]] - tmp_pronoun_sentence_index <= 0:
+                            predict_coreference += 1
+                            result_by_pronoun_type[current_pronoun_type]['predict_coreference'] += 1
+                            if verify_correct_NP_match(NP, pronoun_example['correct_NPs'], 'exact'):
+                                correct_predict_coreference += 1
+                                result_by_pronoun_type[current_pronoun_type]['correct_predict_coreference'] += 1
+                    all_coreference += len(pronoun_example['correct_NPs'])
+                    result_by_pronoun_type[current_pronoun_type]['all_coreference'] += len(
+                                pronoun_example['correct_NPs'])
+            if (example_num+1) % 10 == 0:
+                print(example_num)
+                p = correct_predict_coreference / predict_coreference
+                r = correct_predict_coreference / all_coreference
+                f1 = 2 * p * r / (p + r)
+                print("Average F1 (py): {:.2f}%".format(f1 * 100))
+                print("Average precision (py): {:.2f}%".format(p * 100))
+                print("Average recall (py): {:.2f}%".format(r * 100))
+                print('correct_predict_coreference', correct_predict_coreference)
+                print('predict_coreference', predict_coreference)
+                print('all_coreference', all_coreference)
+
+        for tmp_pronoun_type in interested_pronouns:
+            try:
+                print('Pronoun type:', tmp_pronoun_type)
+                tmp_p = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                        result_by_pronoun_type[tmp_pronoun_type]['predict_coreference']
+                tmp_r = result_by_pronoun_type[tmp_pronoun_type]['correct_predict_coreference'] / \
+                        result_by_pronoun_type[tmp_pronoun_type]['all_coreference']
+                tmp_f1 = 2 * tmp_p * tmp_r / (tmp_p + tmp_r)
+                print('p:', tmp_p)
+                print('r:', tmp_r)
+                print('f1:', tmp_f1)
+            except:
+                pass
+        p = correct_predict_coreference / predict_coreference
+        r = correct_predict_coreference / all_coreference
+        f1 = 2 * p * r / (p + r)
+        print("Average F1 (py): {:.2f}%".format(f1 * 100))
+        print("Average precision (py): {:.2f}%".format(p * 100))
+        print("Average recall (py): {:.2f}%".format(r * 100))
+        print('correct_predict_coreference', correct_predict_coreference)
+        print('predict_coreference', predict_coreference)
+        print('all_coreference', all_coreference)
+        print('end')
+
     def evaluate_pronoun_coreference(self, session, evaluation_data):
         data_for_analysis = list()
 

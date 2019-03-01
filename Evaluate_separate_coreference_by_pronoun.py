@@ -19,7 +19,7 @@ from tqdm import tqdm
 #     model.restore(session)
 #     model.evaluate(session, official_stdout=True)
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
     test_data = list()
     print('Start to process data...')
     with open('medical_data/test.pronoun.jsonlines', 'r') as f:
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     with tf.Session() as session:
         model.restore(session)
-        model.evaluate_pronoun_coreference(session, test_data)
+        model.evaluate_pronoun_coreference_based_on_cluster(session, test_data)
         # print('we are working on NP-NP')
 
 
