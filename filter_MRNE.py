@@ -16,7 +16,7 @@ if __name__ == "__main__":
     total_lines = 0
     kept_lines = 0
     out_filename = "MRNE.filtered"
-    with open('/home/data/corpora/MRNE/all_embedding_add_context.txt', 'r') as in_file:
+    with open('/home/data/corpora/MRWE/all_embedding_add_context.txt', 'r') as in_file:
         with open(out_filename, "w") as out_file:
             for line in in_file.readlines():
                 total_lines += 1
