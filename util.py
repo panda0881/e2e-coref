@@ -213,10 +213,14 @@ class EmbeddingDictionary(object):
         return embedding_dict
 
     def __getitem__(self, key):
-        embedding = self._embeddings[key]
-        if self._normalize:
-            embedding = self.normalize(embedding)
-        return embedding
+        if key in self._embeddings:
+            embedding = self._embeddings[key]
+            if self._normalize:
+                embedding = self.normalize(embedding)
+            return embedding
+        else:
+            print('We do not find the embedding of word:', key)
+            return np.zeros(self.size)
 
     def normalize(self, v):
         norm = np.linalg.norm(v)

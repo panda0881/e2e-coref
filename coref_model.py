@@ -25,6 +25,8 @@ class CorefModel(object):
         self.config = config
         self.context_embeddings = util.EmbeddingDictionary(config["context_embeddings"])
         self.head_embeddings = util.EmbeddingDictionary(config["head_embeddings"], maybe_cache=self.context_embeddings)
+        if config['use_MRNE']:
+            self.MRNE_embedding = util.EmbeddingDictionary(config['MRNE_embeddings'])
         self.char_embedding_size = config["char_embedding_size"]
         self.char_dict = util.load_char_dict(config["char_vocab_path"])
         self.max_span_width = config["max_span_width"]
@@ -195,13 +197,19 @@ class CorefModel(object):
         max_word_length = max(max(max(len(w) for w in s) for s in sentences), max(self.config["filter_widths"]))
         text_len = np.array([len(s) for s in sentences])
         tokens = [[""] * max_sentence_length for _ in sentences]
-        context_word_emb = np.zeros([len(sentences), max_sentence_length, self.context_embeddings.size])
+        if self.config['use_MRNE']:
+            context_word_emb = np.zeros([len(sentences), max_sentence_length, self.context_embeddings.size+self.MRNE_embedding.size])
+        else:
+            context_word_emb = np.zeros([len(sentences), max_sentence_length, self.context_embeddings.size])
         head_word_emb = np.zeros([len(sentences), max_sentence_length, self.head_embeddings.size])
         char_index = np.zeros([len(sentences), max_sentence_length, max_word_length])
         for i, sentence in enumerate(sentences):
             for j, word in enumerate(sentence):
                 tokens[i][j] = word
-                context_word_emb[i, j] = self.context_embeddings[word]
+                if self.config['use_MRNE']:
+                    context_word_emb[i, j] = np.concatenate([self.context_embeddings[word], self.MRNE_embedding[word]], axis=None)
+                else:
+                    context_word_emb[i, j] = self.context_embeddings[word]
                 head_word_emb[i, j] = self.head_embeddings[word]
                 char_index[i, j, :len(word)] = [self.char_dict[c] for c in word]
         tokens = np.array(tokens)
