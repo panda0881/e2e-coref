@@ -219,7 +219,7 @@ class EmbeddingDictionary(object):
                 embedding = self.normalize(embedding)
             return embedding
         else:
-            print('We do not find the embedding of word:', key)
+            # print('We do not find the embedding of word:', key)
             return np.zeros(self.size)
 
     def normalize(self, v):
