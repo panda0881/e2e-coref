@@ -917,6 +917,8 @@ class CorefModel(object):
                         #     #     print('False')
                         #     continue
                         # print(word_index_to_sentence_index[NP[0]])
+                        if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
+                            continue
                         if -2 <= word_index_to_sentence_index[NP[0]] - tmp_pronoun_sentence_index <= 0:
 
                         # if verify_correct_NP_match(NP, pronoun_example['candidate_NPs'], 'exact'):
