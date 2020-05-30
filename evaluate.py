@@ -18,7 +18,7 @@ with open('freq_spans.json', 'r') as f:
   new_list = set(new_list)
 
 test_data = list()
-with open('medical_data/test.pronoun.jsonlines', 'r') as f:
+with open('conll_data/test.pronoun.jsonlines', 'r') as f:
   for line in f:
     test_data.append(json.loads(line))
 
