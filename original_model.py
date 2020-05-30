@@ -888,12 +888,6 @@ class CorefModel(object):
                 for c in predicted_clusters:
                     if tuple(pronoun_example['current_pronoun']) in c:
                         predict_cluster = c
-                        # print('found one correct_cluster:', c)
-                        break
-                correct_cluster = None
-                for c in example['clusters']:
-                    if verify_correct_NP_match(pronoun_example['current_pronoun'], c, 'exact'):
-                        correct_cluster = c
                         break
 
                 if predict_cluster:
@@ -917,7 +911,7 @@ class CorefModel(object):
                         #     #     print('False')
                         #     continue
                         # print(word_index_to_sentence_index[NP[0]])
-                        if NP[0] == NP[1] and all_sentence[NP[0]] in all_pronouns:
+                        if NP[0] == NP[1] and all_sentence[NP[0]] == all_sentence[pronoun_example['current_pronoun'][0]]:
                             continue
                         if -2 <= word_index_to_sentence_index[NP[0]] - tmp_pronoun_sentence_index <= 0:
 
